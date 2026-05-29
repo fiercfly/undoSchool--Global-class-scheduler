@@ -1,0 +1,240 @@
+{
+  "info": {
+    "_postman_id": "8b5f3a09-77f6-42d1-b514-f6278be33738",
+    "name": "Global Class Booking System API",
+    "description": "Postman Collection for testing the Global Class Booking System Backend, including offering creation, session scheduling, localized Parent discovery, transactional bookings, and schedule overlap conflict locks.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Teacher APIs",
+      "item": [
+        {
+          "name": "1. Create Offering",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teacherId\": \"bb1d0828-47e9-4b97-9587-927663f191a4\",\n  \"courseId\": \"412c4c20-48b1-4753-86f0-8f358f0ac594\",\n  \"name\": \"Saturday Python Batch\",\n  \"capacity\": 5\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/teachers/offerings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "teachers",
+                "offerings"
+              ]
+            },
+            "description": "Creates a new class offering section with a student capacity limit."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Add Sessions to Offering",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teacherId\": \"bb1d0828-47e9-4b97-9587-927663f191a4\",\n  \"timezone\": \"Asia/Kolkata\",\n  \"sessions\": [\n    {\n      \"startTime\": \"2026-06-06 18:00:00\",\n      \"endTime\": \"2026-06-06 19:00:00\"\n    },\n    {\n      \"startTime\": \"2026-06-13 18:00:00\",\n      \"endTime\": \"2026-06-13 19:00:00\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/teachers/offerings/REPLACE_WITH_OFFERING_ID/sessions",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "teachers",
+                "offerings",
+                "REPLACE_WITH_OFFERING_ID",
+                "sessions"
+              ]
+            },
+            "description": "Schedules date/time sessions for a class offering. Converts input local times to UTC."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get Teacher Offerings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/teachers/bb1d0828-47e9-4b97-9587-927663f191a4/offerings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "teachers",
+                "bb1d0828-47e9-4b97-9587-927663f191a4",
+                "offerings"
+              ]
+            },
+            "description": "Retrieves all offerings, scheduled sessions, and booking stats for a specific teacher."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Parent APIs",
+      "item": [
+        {
+          "name": "1. Get Available Offerings (UTC)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/parents/offerings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "parents",
+                "offerings"
+              ]
+            },
+            "description": "Lists all offerings that have scheduled sessions, returning UTC date timestamps."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get Available Offerings (New York timezone)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/parents/offerings?timezone=America/New_York",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "parents",
+                "offerings"
+              ],
+              "query": [
+                {
+                  "key": "timezone",
+                  "value": "America/New_York"
+                }
+              ]
+            },
+            "description": "Retrieves available scheduled offerings, automatically converting and formatting all session times into New York local time."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Book Offering",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parentId\": \"bd696153-a40a-4989-a96e-2da320d20880\",\n  \"offeringId\": \"REPLACE_WITH_OFFERING_ID\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/parents/bookings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "parents",
+                "bookings"
+              ]
+            },
+            "description": "Registers booking for the parent. Blocks overlapping bookings (Rule 2) and capacity over-runs (Rule 3) under strict transaction isolation."
+          },
+          "response": []
+        },
+        {
+          "name": "4. Get Bookings (UTC)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/parents/bd696153-a40a-4989-a96e-2da320d20880/bookings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "parents",
+                "bd696153-a40a-4989-a96e-2da320d20880",
+                "bookings"
+              ]
+            },
+            "description": "Lists all booked offerings for a specific parent in UTC format."
+          },
+          "response": []
+        },
+        {
+          "name": "5. Get Bookings (New York Localized)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/parents/bd696153-a40a-4989-a96e-2da320d20880/bookings?timezone=America/New_York",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "parents",
+                "bd696153-a40a-4989-a96e-2da320d20880",
+                "bookings"
+              ],
+              "query": [
+                {
+                  "key": "timezone",
+                  "value": "America/New_York"
+                }
+              ]
+            },
+            "description": "Lists all booked offerings for a parent, translating session schedules into their local timezone."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
