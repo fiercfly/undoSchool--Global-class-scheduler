@@ -1,6 +1,8 @@
 import app from "./app";
 import db from "./database/connection";
 import dotenv from "dotenv";
+import path from "path";
+import { CustomMigrationSource } from "./database/migrationSource";
 
 dotenv.config();
 
@@ -12,7 +14,10 @@ async function bootstrap() {
 
     // 1. Run migrations automatically on startup
     console.log("[Bootstrap] Running database migrations...");
-    await db.migrate.latest();
+    const migrationsDir = path.join(__dirname, "database", "migrations");
+    await db.migrate.latest({
+      migrationSource: new CustomMigrationSource(db, migrationsDir)
+    });
     console.log("[Bootstrap] Database migrations applied successfully.");
 
     // 2. Check if database needs seeding
