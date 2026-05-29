@@ -8,7 +8,7 @@ const config: { [key: string]: Knex.Config } = {
   development: {
     client: "sqlite3",
     connection: {
-      filename: path.join(__dirname, "data", "school.sqlite"),
+      filename: path.join(process.cwd(), "data", "school.sqlite"),
     },
     useNullAsDefault: true,
     pool: {
