@@ -12,11 +12,12 @@ app.use(cors());
 app.use(express.json());
 
 // Serve the UI from the public/ folder
-app.use(express.static(path.join(__dirname, "..", "public")));
+// process.cwd() always points to the project root regardless of where the compiled file lives
+app.use(express.static(path.join(process.cwd(), "public")));
 
 // Root: serve the HTML UI
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+  res.sendFile(path.join(process.cwd(), "public", "index.html"));
 });
 
 // Health check
