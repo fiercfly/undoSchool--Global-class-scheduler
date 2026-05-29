@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 import apiRoutes from "./routes";
 import { errorHandler } from "./errors/errorHandler";
+import db from "./database/connection";
 
 const app = express();
 
@@ -9,20 +11,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Root welcome endpoint
+// Serve the UI from the public/ folder
+app.use(express.static(path.join(__dirname, "..", "public")));
+
+// Root: serve the HTML UI
 app.get("/", (req, res) => {
-  res.status(200).json({
-    name: "Global Class Offering Booking System API",
-    status: "online",
-    version: "1.0.0",
-    description: "Production-ready backend API for managing course offerings, dynamic timezone localizations, and high-concurrency booking transactions with strict database-level locking.",
-    docs: "https://github.com/fiercfly/undoSchool--Global-class-scheduler#api-documentation",
-    health: "/health",
-    timestamp: new Date().toISOString(),
-  });
+  res.sendFile(path.join(__dirname, "..", "public", "index.html"));
 });
 
-// API Documentation / Health check
+// Health check
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "success",
@@ -31,11 +28,25 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Metadata endpoint: returns all seeded teachers, parents, and courses so the UI can populate dropdowns
+app.get("/api/metadata", async (req, res, next) => {
+  try {
+    const [teachers, parents, courses] = await Promise.all([
+      db("teachers").select("id", "name", "email"),
+      db("parents").select("id", "name", "email"),
+      db("courses").select("id", "title"),
+    ]);
+    res.status(200).json({ status: "success", data: { teachers, parents, courses } });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Mount all API endpoints under /api
 app.use("/api", apiRoutes);
 
 // Fallback for unmatched routes
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404).json({
     status: "fail",
     error: `Route not found: ${req.method} ${req.originalUrl}`,

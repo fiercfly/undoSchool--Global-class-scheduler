@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Class Scheduler — undoSchool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0c10;
+      --surface: #111520;
+      --surface2: #181e2e;
+      --surface3: #1e2638;
+      --border: #252d42;
+      --border2: #2e3850;
+      --accent: #5b8af5;
+      --accent2: #7c5bf5;
+      --accent-glow: rgba(91,138,245,0.18);
+      --green: #34d399;
+      --green-dim: rgba(52,211,153,0.12);
+      --red: #f87171;
+      --red-dim: rgba(248,113,113,0.12);
+      --yellow: #fbbf24;
+      --yellow-dim: rgba(251,191,36,0.1);
+      --text: #e2e8f0;
+      --text2: #94a3b8;
+      --text3: #64748b;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      font-size: 14px;
+    }
+
+    /* ── Header ── */
+    header {
+      background: rgba(17,21,32,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+    .logo-text { font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
+    .logo-sub { font-size: 11px; color: var(--text3); margin-left: 4px; }
+    .status-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--green-dim); border: 1px solid rgba(52,211,153,0.25);
+      color: var(--green); font-size: 11px; font-weight: 500;
+      padding: 4px 10px; border-radius: 20px;
+    }
+    .status-badge span { width:6px;height:6px;border-radius:50%;background:var(--green); }
+
+    /* ── Layout ── */
+    .container { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px; width: fit-content; margin-bottom: 28px; }
+    .tab {
+      padding: 8px 20px; border-radius: 9px; font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: all .2s; border: none; outline: none;
+      background: transparent; color: var(--text2);
+    }
+    .tab.active {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 2px 12px rgba(91,138,245,0.35);
+    }
+    .tab:hover:not(.active) { background: var(--surface2); color: var(--text); }
+
+    /* ── Section ── */
+    .workspace { display: none; }
+    .workspace.active { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media(max-width:900px) { .workspace.active { grid-template-columns: 1fr; } }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .card-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    }
+    .card-icon.blue { background: rgba(91,138,245,0.12); }
+    .card-icon.purple { background: rgba(124,91,245,0.12); }
+    .card-icon.green { background: var(--green-dim); }
+    .card-icon.yellow { background: var(--yellow-dim); }
+    .card-title { font-weight: 600; font-size: 13px; }
+    .card-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+    .card-body { padding: 20px; }
+
+    /* ── Form ── */
+    .form-row { margin-bottom: 14px; }
+    label { display: block; font-size: 11px; font-weight: 500; color: var(--text2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    input, select, textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+      color: var(--text); border-radius: var(--radius-sm); padding: 9px 12px;
+      font-size: 13px; font-family: inherit; transition: border-color .2s;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    select option { background: var(--surface2); }
+    textarea { resize: vertical; min-height: 70px; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+    .form-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: var(--radius-sm); border: none;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; outline: none;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #4a78e8; box-shadow: 0 4px 16px rgba(91,138,245,0.4); }
+    .btn-secondary { background: var(--surface3); color: var(--text); border: 1px solid var(--border2); }
+    .btn-secondary:hover { background: var(--surface2); border-color: var(--accent); }
+    .btn-green { background: var(--green); color: #0a1a0f; }
+    .btn-green:hover { opacity: .88; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* ── Session builder ── */
+    .session-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+    .session-item {
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); padding: 12px;
+      display: grid; grid-template-columns: 1fr 1fr 32px; gap: 8px; align-items: end;
+    }
+    .session-item .remove-btn {
+      width: 32px; height: 32px; border-radius: 6px; background: var(--red-dim);
+      border: 1px solid rgba(248,113,113,0.2); color: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 14px; transition: all .2s; flex-shrink: 0;
+    }
+    .session-item .remove-btn:hover { background: rgba(248,113,113,0.22); }
+
+    /* ── Response panel ── */
+    .response-panel {
+      margin-top: 14px; border-radius: var(--radius-sm); overflow: hidden;
+      display: none;
+    }
+    .response-panel.visible { display: block; }
+    .response-header {
+      padding: 8px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .response-header.success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,.2); border-bottom: none; }
+    .response-header.error { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,113,.2); border-bottom: none; }
+    .response-body {
+      background: #0d1117; border: 1px solid var(--border);
+      padding: 12px; font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px; color: #a8daff; overflow-x: auto; max-height: 280px; overflow-y: auto;
+      white-space: pre;
+    }
+
+    /* ── Result list ── */
+    .result-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+    .result-item {
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); padding: 14px;
+    }
+    .result-item-title { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+    .result-item-sub { font-size: 11px; color: var(--text3); }
+    .result-item-sub b { color: var(--text2); }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600;
+    }
+    .badge-blue { background: rgba(91,138,245,0.12); color: var(--accent); border: 1px solid rgba(91,138,245,0.2); }
+    .badge-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+    .badge-red { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+
+    /* ── Empty state ── */
+    .empty { text-align: center; padding: 32px 16px; color: var(--text3); font-size: 13px; }
+    .empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    /* ── Spinner ── */
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast-item {
+      padding: 12px 16px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500;
+      max-width: 320px; animation: slideIn .3s ease;
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .toast-success { background: #0e2118; border: 1px solid rgba(52,211,153,.3); color: var(--green); }
+    .toast-error { background: #1f0e0e; border: 1px solid rgba(248,113,113,.3); color: var(--red); }
+    .toast-info { background: #0e1630; border: 1px solid rgba(91,138,245,.3); color: var(--accent); }
+
+    /* ── Info block ── */
+    .info-block {
+      background: rgba(91,138,245,0.06); border: 1px solid rgba(91,138,245,0.15);
+      border-radius: var(--radius-sm); padding: 10px 12px;
+      font-size: 11.5px; color: var(--text2); margin-bottom: 14px;
+      line-height: 1.6;
+    }
+    .info-block code { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 11px; background: rgba(91,138,245,0.1); padding: 1px 4px; border-radius: 4px; }
+
+    /* ── Persona pills ── */
+    .persona-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .persona-pill {
+      padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;
+      cursor: pointer; transition: all .2s;
+      border: 1px solid var(--border2); background: var(--surface2); color: var(--text2);
+    }
+    .persona-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .persona-pill:hover:not(.active) { border-color: var(--accent); color: var(--text); }
+
+    /* Full-width card */
+    .workspace-full { display: none; }
+    .workspace-full.active { display: flex; flex-direction: column; gap: 20px; }
+    .full-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media(max-width:900px) { .full-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    <span class="logo-text">Global Class Scheduler</span>
+    <span class="logo-sub">/ undoSchool</span>
+  </div>
+  <div class="status-badge"><span></span> API Online</div>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('teacher')">Teacher Workspace</button>
+    <button class="tab" onclick="switchTab('parent')">Parent Workspace</button>
+  </div>
+
+  <!-- ============ TEACHER WORKSPACE ============ -->
+  <div id="workspace-teacher" class="workspace-full active">
+    <div class="full-grid">
+
+      <!-- Create Offering -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">📋</div>
+          <div>
+            <div class="card-title">Create Class Offering</div>
+            <div class="card-sub">POST /api/teachers/offerings</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <label>Teacher</label>
+            <select id="t-teacher-select" onchange="document.getElementById('t-teacher-id').value=this.value">
+              <option value="">Loading teachers...</option>
+            </select>
+            <input type="hidden" id="t-teacher-id" />
+          </div>
+          <div class="form-row">
+            <label>Course</label>
+            <select id="t-course-select" onchange="document.getElementById('t-course-id').value=this.value">
+              <option value="">Loading courses...</option>
+            </select>
+            <input type="hidden" id="t-course-id" />
+          </div>
+          <div class="form-grid2">
+            <div class="form-row">
+              <label>Offering Name</label>
+              <input type="text" id="t-offering-name" placeholder="e.g. Saturday Batch" />
+            </div>
+            <div class="form-row">
+              <label>Capacity</label>
+              <input type="number" id="t-capacity" value="10" min="1" />
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="createOffering()">
+            <span>Create Offering</span>
+          </button>
+          <div id="create-offering-response" class="response-panel"></div>
+        </div>
+      </div>
+
+      <!-- Add Sessions -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon purple">🗓️</div>
+          <div>
+            <div class="card-title">Add Sessions to Offering</div>
+            <div class="card-sub">POST /api/teachers/offerings/:id/sessions</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="info-block">
+            Times are parsed in the teacher's timezone. Use ISO format: <code>2026-06-10T18:00:00</code>
+          </div>
+          <div class="form-row">
+            <label>Teacher</label>
+            <select id="s-teacher-select" onchange="document.getElementById('s-teacher-id').value=this.value">
+              <option value="">Loading teachers...</option>
+            </select>
+            <input type="hidden" id="s-teacher-id" />
+          </div>
+          <div class="form-row">
+            <label>Offering ID</label>
+            <input type="text" id="s-offering-id" placeholder="Paste offering UUID here" />
+          </div>
+          <div class="form-row">
+            <label>Teacher Timezone</label>
+            <select id="s-timezone">
+              <option value="Asia/Kolkata">Asia/Kolkata (IST +5:30)</option>
+              <option value="America/New_York">America/New_York (EDT)</option>
+              <option value="Europe/London">Europe/London (BST)</option>
+              <option value="UTC">UTC</option>
+              <option value="America/Los_Angeles">America/Los_Angeles (PDT)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Sessions</label>
+            <div class="session-list" id="session-list">
+              <div class="session-item">
+                <div class="form-row" style="margin:0">
+                  <label>Start Time</label>
+                  <input type="datetime-local" class="session-start" />
+                </div>
+                <div class="form-row" style="margin:0">
+                  <label>End Time</label>
+                  <input type="datetime-local" class="session-end" />
+                </div>
+                <div></div>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="addSessionRow()" style="margin-top:6px">+ Add Another Session</button>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="addSessions()">Submit Sessions</button>
+          <div id="add-sessions-response" class="response-panel"></div>
+        </div>
+      </div>
+
+    </div><!-- /full-grid -->
+
+    <!-- View Teacher Schedule -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon yellow">📊</div>
+        <div>
+          <div class="card-title">Teacher Schedule & Offerings</div>
+          <div class="card-sub">GET /api/teachers/:id/offerings</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:10px;align-items:flex-end">
+          <div style="flex:1">
+            <label>Select Teacher</label>
+            <select id="view-teacher-select" onchange="document.getElementById('view-teacher-id').value=this.value">
+              <option value="">Loading teachers...</option>
+            </select>
+            <input type="hidden" id="view-teacher-id" />
+          </div>
+          <button class="btn btn-secondary" onclick="loadTeacherSchedule()">Load Schedule</button>
+        </div>
+        <div id="teacher-schedule-result" class="result-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PARENT WORKSPACE ============ -->
+  <div id="workspace-parent" class="workspace-full">
+    <div class="full-grid">
+
+      <!-- Browse Offerings -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">🌍</div>
+          <div>
+            <div class="card-title">Browse Available Offerings</div>
+            <div class="card-sub">GET /api/parents/offerings?timezone=...</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <label>Your Timezone</label>
+            <select id="browse-timezone">
+              <option value="Asia/Kolkata">Asia/Kolkata (IST +5:30)</option>
+              <option value="America/New_York">America/New_York (EDT)</option>
+              <option value="Europe/London">Europe/London (BST)</option>
+              <option value="UTC">UTC</option>
+              <option value="America/Los_Angeles">America/Los_Angeles (PDT)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="browseOfferings()">Load Offerings</button>
+          <div id="browse-result" class="result-list"></div>
+        </div>
+      </div>
+
+      <!-- Book an Offering -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">✅</div>
+          <div>
+            <div class="card-title">Book a Class Offering</div>
+            <div class="card-sub">POST /api/parents/bookings</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="info-block">
+            Booking is protected by row-level DB locks. Duplicate bookings, time conflicts, and over-capacity requests are all rejected atomically.
+          </div>
+          <div class="form-row">
+            <label>Parent</label>
+            <div class="persona-row" id="parent-pills"></div>
+            <input type="hidden" id="book-parent-id" />
+          </div>
+          <div class="form-row">
+            <label>Offering ID</label>
+            <input type="text" id="book-offering-id" placeholder="Paste offering UUID from Browse panel" />
+          </div>
+          <button class="btn btn-green btn-full" onclick="bookOffering()">Book Now</button>
+          <div id="book-response" class="response-panel"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- View My Bookings -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon yellow">📅</div>
+        <div>
+          <div class="card-title">My Bookings</div>
+          <div class="card-sub">GET /api/parents/:id/bookings?timezone=...</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div style="flex:1;min-width:180px">
+            <label>Parent</label>
+            <select id="my-bookings-parent">
+              <option value="">Select parent...</option>
+            </select>
+          </div>
+          <div style="flex:1;min-width:150px">
+            <label>View in Timezone</label>
+            <select id="my-bookings-timezone">
+              <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+              <option value="America/New_York">America/New_York (EDT)</option>
+              <option value="Europe/London">Europe/London (BST)</option>
+              <option value="UTC">UTC</option>
+              <option value="America/Los_Angeles">America/Los_Angeles (PDT)</option>
+            </select>
+          </div>
+          <button class="btn btn-secondary" onclick="loadMyBookings()">Load Bookings</button>
+        </div>
+        <div id="my-bookings-result" class="result-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // ─── Config ───────────────────────────────────────────────────────────────
+  const API = ''; // Same origin — empty string means relative URLs
+
+  // ─── State ────────────────────────────────────────────────────────────────
+  let metadata = { teachers: [], parents: [], courses: [] };
+
+  // ─── Tab switching ────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((el, i) => el.classList.toggle('active', ['teacher','parent'][i] === tab));
+    document.querySelectorAll('.workspace-full').forEach(el => el.classList.remove('active'));
+    document.getElementById(`workspace-${tab}`).classList.add('active');
+  }
+
+  // ─── Toast ────────────────────────────────────────────────────────────────
+  function toast(msg, type = 'info') {
+    const container = document.getElementById('toast');
+    const el = document.createElement('div');
+    el.className = `toast-item toast-${type}`;
+    el.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</span><span>${msg}</span>`;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+
+  // ─── Response panel ───────────────────────────────────────────────────────
+  function showResponse(panelId, data, success) {
+    const panel = document.getElementById(panelId);
+    panel.classList.add('visible');
+    panel.innerHTML = `
+      <div class="response-header ${success ? 'success' : 'error'}">
+        ${success ? '✓ SUCCESS' : '✗ ERROR'}
+      </div>
+      <div class="response-body">${JSON.stringify(data, null, 2)}</div>
+    `;
+  }
+
+  // ─── API helper ───────────────────────────────────────────────────────────
+  async function apiCall(method, path, body) {
+    const opts = {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(API + path, opts);
+    const json = await res.json();
+    return { ok: res.ok, status: res.status, data: json };
+  }
+
+  // ─── Metadata bootstrap ───────────────────────────────────────────────────
+  async function loadMetadata() {
+    try {
+      const { ok, data } = await apiCall('GET', '/api/metadata');
+      if (!ok) { toast('Could not load metadata from server', 'error'); return; }
+      metadata = data.data;
+
+      populateSelect('t-teacher-select', 't-teacher-id', metadata.teachers, t => `${t.name} — ${t.email}`, t => t.id);
+      populateSelect('s-teacher-select', 's-teacher-id', metadata.teachers, t => `${t.name}`, t => t.id);
+      populateSelect('view-teacher-select', 'view-teacher-id', metadata.teachers, t => `${t.name}`, t => t.id);
+      populateSelect('t-course-select', 't-course-id', metadata.courses, c => c.title, c => c.id);
+      populateSelect('my-bookings-parent', null, metadata.parents, p => `${p.name} — ${p.email}`, p => p.id);
+
+      // Parent pills for booking
+      const pillsContainer = document.getElementById('parent-pills');
+      pillsContainer.innerHTML = '';
+      metadata.parents.forEach((p, i) => {
+        const pill = document.createElement('div');
+        pill.className = 'persona-pill' + (i === 0 ? ' active' : '');
+        pill.textContent = p.name.split(' ')[0];
+        pill.title = p.email;
+        pill.onclick = () => {
+          document.querySelectorAll('.persona-pill').forEach(el => el.classList.remove('active'));
+          pill.classList.add('active');
+          document.getElementById('book-parent-id').value = p.id;
+        };
+        if (i === 0) document.getElementById('book-parent-id').value = p.id;
+        pillsContainer.appendChild(pill);
+      });
+
+      toast('Metadata loaded — teachers, parents, courses ready', 'success');
+    } catch (e) {
+      toast('Server error loading metadata: ' + e.message, 'error');
+    }
+  }
+
+  function populateSelect(selectId, hiddenId, items, label, value) {
+    const el = document.getElementById(selectId);
+    el.innerHTML = '<option value="">Select...</option>';
+    items.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = value(item);
+      opt.textContent = label(item);
+      el.appendChild(opt);
+    });
+    if (hiddenId) {
+      el.onchange = () => document.getElementById(hiddenId).value = el.value;
+    }
+  }
+
+  // ─── Session row builder ───────────────────────────────────────────────────
+  function addSessionRow() {
+    const list = document.getElementById('session-list');
+    const item = document.createElement('div');
+    item.className = 'session-item';
+    item.innerHTML = `
+      <div class="form-row" style="margin:0">
+        <label>Start Time</label>
+        <input type="datetime-local" class="session-start" />
+      </div>
+      <div class="form-row" style="margin:0">
+        <label>End Time</label>
+        <input type="datetime-local" class="session-end" />
+      </div>
+      <div class="remove-btn" onclick="this.closest('.session-item').remove()">✕</div>
+    `;
+    list.appendChild(item);
+  }
+
+  // ─── Teacher: Create Offering ─────────────────────────────────────────────
+  async function createOffering() {
+    const teacherId = document.getElementById('t-teacher-id').value;
+    const courseId = document.getElementById('t-course-id').value;
+    const name = document.getElementById('t-offering-name').value.trim();
+    const capacity = parseInt(document.getElementById('t-capacity').value);
+
+    if (!teacherId || !courseId || !name) { toast('Fill all fields first', 'error'); return; }
+
+    const { ok, data } = await apiCall('POST', '/api/teachers/offerings', { teacherId, courseId, name, capacity });
+    showResponse('create-offering-response', data, ok);
+
+    if (ok) {
+      toast(`Offering "${name}" created!`, 'success');
+      const offeringId = data.data?.id;
+      if (offeringId) {
+        document.getElementById('s-offering-id').value = offeringId;
+        document.getElementById('book-offering-id').value = offeringId;
+        toast(`Offering ID auto-filled in sessions and booking panels`, 'info');
+      }
+    } else {
+      toast(data.error || 'Create failed', 'error');
+    }
+  }
+
+  // ─── Teacher: Add Sessions ────────────────────────────────────────────────
+  async function addSessions() {
+    const teacherId = document.getElementById('s-teacher-id').value;
+    const offeringId = document.getElementById('s-offering-id').value.trim();
+    const timezone = document.getElementById('s-timezone').value;
+
+    if (!teacherId || !offeringId) { toast('Teacher and Offering ID are required', 'error'); return; }
+
+    const startEls = document.querySelectorAll('.session-start');
+    const endEls = document.querySelectorAll('.session-end');
+    const sessions = [];
+
+    startEls.forEach((el, i) => {
+      const start = el.value;
+      const end = endEls[i]?.value;
+      if (start && end) {
+        sessions.push({ startTime: start.replace('T', 'T'), endTime: end.replace('T', 'T') });
+      }
+    });
+
+    if (sessions.length === 0) { toast('Add at least one complete session', 'error'); return; }
+
+    const { ok, data } = await apiCall('POST', `/api/teachers/offerings/${offeringId}/sessions`, { teacherId, timezone, sessions });
+    showResponse('add-sessions-response', data, ok);
+
+    if (ok) toast(`${sessions.length} session(s) added successfully!`, 'success');
+    else toast(data.error || 'Session add failed', 'error');
+  }
+
+  // ─── Teacher: Load Schedule ───────────────────────────────────────────────
+  async function loadTeacherSchedule() {
+    const teacherId = document.getElementById('view-teacher-id').value;
+    if (!teacherId) { toast('Select a teacher first', 'error'); return; }
+
+    const { ok, data } = await apiCall('GET', `/api/teachers/${teacherId}/offerings`);
+    const container = document.getElementById('teacher-schedule-result');
+
+    if (!ok) { container.innerHTML = `<div class="empty">Error loading schedule</div>`; return; }
+
+    const offerings = data.data || [];
+    if (offerings.length === 0) {
+      container.innerHTML = `<div class="empty"><div class="empty-icon">📭</div>No offerings found for this teacher yet.</div>`;
+      return;
+    }
+
+    container.innerHTML = offerings.map(o => `
+      <div class="result-item">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="result-item-title">${o.name}</div>
+          <div style="display:flex;gap:6px">
+            <span class="badge badge-blue">Capacity: ${o.capacity}</span>
+            <span class="badge badge-green">Booked: ${o.bookingCount || 0}</span>
+          </div>
+        </div>
+        <div class="result-item-sub" style="margin-bottom:8px"><b>Offering ID:</b> <code style="font-family:monospace;font-size:10px;color:#94a3b8">${o.id}</code></div>
+        ${(o.sessions || []).length === 0 ? '<div class="result-item-sub">No sessions scheduled yet.</div>' :
+          (o.sessions || []).map(s => `
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-top:6px">
+              <div class="result-item-sub">
+                <b>Start:</b> ${new Date(s.startTime).toLocaleString()} &nbsp;→&nbsp; <b>End:</b> ${new Date(s.endTime).toLocaleString()}
+              </div>
+            </div>
+          `).join('')
+        }
+      </div>
+    `).join('');
+  }
+
+  // ─── Parent: Browse Offerings ─────────────────────────────────────────────
+  async function browseOfferings() {
+    const timezone = document.getElementById('browse-timezone').value;
+    const { ok, data } = await apiCall('GET', `/api/parents/offerings?timezone=${encodeURIComponent(timezone)}`);
+    const container = document.getElementById('browse-result');
+
+    if (!ok) { container.innerHTML = `<div class="empty">Error loading offerings</div>`; return; }
+
+    const offerings = data.data || [];
+    if (offerings.length === 0) {
+      container.innerHTML = `<div class="empty"><div class="empty-icon">📭</div>No offerings available. Create one from the Teacher Workspace first.</div>`;
+      return;
+    }
+
+    container.innerHTML = offerings.map(o => `
+      <div class="result-item">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="result-item-title">${o.name}</div>
+          <div style="display:flex;gap:6px">
+            <span class="badge badge-blue">Cap: ${o.capacity}</span>
+            <span class="badge ${o.spotsLeft > 0 ? 'badge-green' : 'badge-red'}">${o.spotsLeft > 0 ? o.spotsLeft + ' spots left' : 'Full'}</span>
+          </div>
+        </div>
+        <div class="result-item-sub" style="margin-bottom:4px">
+          <b>Course:</b> ${o.courseTitle || '—'} &nbsp;|&nbsp; <b>Teacher:</b> ${o.teacherName || '—'}
+        </div>
+        <div class="result-item-sub" style="margin-bottom:8px">
+          <b>Offering ID:</b> <code style="font-family:monospace;font-size:10px;color:#94a3b8;cursor:pointer" onclick="copyOfferingId('${o.id}')" title="Click to copy">${o.id}</code>
+        </div>
+        ${(o.sessions || []).length === 0 ? '' :
+          (o.sessions || []).map(s => `
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-top:4px;font-size:11px;color:var(--text2)">
+              ${s.displayStartTime || s.localStartTime || s.startTime} → ${s.displayEndTime || s.localEndTime || s.endTime}
+            </div>
+          `).join('')
+        }
+        <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="prefillBooking('${o.id}')">
+          Book This Offering →
+        </button>
+      </div>
+    `).join('');
+  }
+
+  function copyOfferingId(id) {
+    navigator.clipboard.writeText(id).then(() => toast('Offering ID copied!', 'info'));
+  }
+
+  function prefillBooking(id) {
+    document.getElementById('book-offering-id').value = id;
+    toast('Offering ID pre-filled in Booking panel', 'info');
+  }
+
+  // ─── Parent: Book Offering ────────────────────────────────────────────────
+  async function bookOffering() {
+    const parentId = document.getElementById('book-parent-id').value;
+    const offeringId = document.getElementById('book-offering-id').value.trim();
+
+    if (!parentId) { toast('Select a parent first', 'error'); return; }
+    if (!offeringId) { toast('Enter an Offering ID', 'error'); return; }
+
+    const { ok, data } = await apiCall('POST', '/api/parents/bookings', { parentId, offeringId });
+    showResponse('book-response', data, ok);
+
+    if (ok) toast('Booking confirmed!', 'success');
+    else toast(data.error || 'Booking failed', 'error');
+  }
+
+  // ─── Parent: My Bookings ──────────────────────────────────────────────────
+  async function loadMyBookings() {
+    const parentId = document.getElementById('my-bookings-parent').value;
+    const timezone = document.getElementById('my-bookings-timezone').value;
+    if (!parentId) { toast('Select a parent first', 'error'); return; }
+
+    const { ok, data } = await apiCall('GET', `/api/parents/${parentId}/bookings?timezone=${encodeURIComponent(timezone)}`);
+    const container = document.getElementById('my-bookings-result');
+
+    if (!ok) { container.innerHTML = `<div class="empty">Error loading bookings</div>`; return; }
+
+    const bookings = data.data || [];
+    if (bookings.length === 0) {
+      container.innerHTML = `<div class="empty"><div class="empty-icon">📭</div>No bookings yet for this parent.</div>`;
+      return;
+    }
+
+    container.innerHTML = bookings.map(b => `
+      <div class="result-item">
+        <div class="result-item-title" style="margin-bottom:6px">${b.offeringName || b.offeringId}</div>
+        <div class="result-item-sub" style="margin-bottom:8px">
+          <b>Booked at:</b> ${new Date(b.bookedAt).toLocaleString()}
+        </div>
+        ${(b.sessions || []).length === 0 ? '' : `
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Sessions in ${timezone}</div>
+          ${b.sessions.map(s => `
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-top:4px;font-size:11px;color:var(--text2)">
+              ${s.displayStartTime || s.localStartTime || s.utcStartTime} → ${s.displayEndTime || s.localEndTime || s.utcEndTime}
+            </div>
+          `).join('')}
+        `}
+      </div>
+    `).join('');
+  }
+
+  // ─── Init ─────────────────────────────────────────────────────────────────
+  loadMetadata();
+</script>
+</body>
+</html>
