@@ -4,6 +4,9 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// Dynamically target TS in source/development, and JS in compiled production/dist
+const extension = __filename.endsWith(".ts") ? "ts" : "js";
+
 const config: { [key: string]: Knex.Config } = {
   development: {
     client: "sqlite3",
@@ -21,11 +24,11 @@ const config: { [key: string]: Knex.Config } = {
     },
     migrations: {
       directory: path.join(__dirname, "src", "database", "migrations"),
-      extension: "ts",
+      extension,
     },
     seeds: {
       directory: path.join(__dirname, "src", "database", "seeds"),
-      extension: "ts",
+      extension,
     },
   },
 
@@ -42,11 +45,11 @@ const config: { [key: string]: Knex.Config } = {
     },
     migrations: {
       directory: path.join(__dirname, "src", "database", "migrations"),
-      extension: "ts",
+      extension,
     },
     seeds: {
       directory: path.join(__dirname, "src", "database", "seeds"),
-      extension: "ts",
+      extension,
     },
   },
 
@@ -65,11 +68,11 @@ const config: { [key: string]: Knex.Config } = {
     },
     migrations: {
       directory: path.join(__dirname, "src", "database", "migrations"),
-      extension: "ts",
+      extension,
     },
     seeds: {
       directory: path.join(__dirname, "src", "database", "seeds"),
-      extension: "ts",
+      extension,
     },
   },
 };
