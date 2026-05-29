@@ -68,6 +68,22 @@ npm run test:concurrency
 
 ---
 
+## Timezone Handling Approach
+
+- **Storage**: All session timings are stored in UTC ISO-8601 format inside the database.
+- **Teacher Parsing**: Teachers can submit session dates with local timezones or offsets. The system translates them to absolute UTC before database insertion.
+- **Parent Discovery**: Parent queries support a `timezone` query parameter. The system uses `luxon` to dynamically convert and format UTC dates into the parent's target local zone (e.g., translating `Asia/Kolkata` class hours to local hours for a New York parent).
+
+---
+
+## Assumptions Made
+
+1. **Initial Seeds**: Courses, teachers, and parent profile contexts are preloaded inside the database schema for operational mapping.
+2. **Batch Registration**: Parents book a class section offering in its entirety (meaning they register for all comprising sessions) rather than single class sessions.
+3. **Conflict Detection**: Session conflicts are identified at the individual parent level based on timeline schedule overlaps across all booked offerings.
+
+---
+
 ## API Endpoints
 
 ### Teacher APIs
