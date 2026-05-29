@@ -9,6 +9,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Root welcome endpoint
+app.get("/", (req, res) => {
+  res.status(200).json({
+    name: "Global Class Offering Booking System API",
+    status: "online",
+    version: "1.0.0",
+    description: "Production-ready backend API for managing course offerings, dynamic timezone localizations, and high-concurrency booking transactions with strict database-level locking.",
+    docs: "https://github.com/fiercfly/undoSchool--Global-class-scheduler#api-documentation",
+    health: "/health",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // API Documentation / Health check
 app.get("/health", (req, res) => {
   res.status(200).json({
