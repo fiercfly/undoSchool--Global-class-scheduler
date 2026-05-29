@@ -37,7 +37,7 @@ app.get("/api/metadata", async (req, res, next) => {
       db("parents").select("id", "name", "email"),
       db("courses").select("id", "title"),
     ]);
-    res.status(200).json({ status: "success", data: { teachers, parents, courses } });
+    res.status(200).json({ teachers, parents, courses });
   } catch (err) {
     next(err);
   }

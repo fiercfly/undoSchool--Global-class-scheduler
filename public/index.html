@@ -1,1061 +1,1011 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Global Class Scheduler — Admin Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Class Booking System Administration Portal</title>
+  
+  <!-- Premium Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --surface-2: #f1f5f9;
-      --border: #e2e8f0;
-      --border-focus: #3b82f6;
-      --text: #0f172a;
-      --text-2: #475569;
-      --text-3: #94a3b8;
-      --accent: #3b82f6;
-      --accent-dark: #2563eb;
-      --accent-light: #eff6ff;
-      --green: #16a34a;
-      --green-light: #f0fdf4;
-      --green-border: #bbf7d0;
-      --red: #dc2626;
-      --red-light: #fef2f2;
-      --red-border: #fecaca;
-      --orange: #ea580c;
-      --orange-light: #fff7ed;
-      --orange-border: #fed7aa;
+      --bg-slate: #f8fafc;
+      --bg-white: #ffffff;
+      --text-dark: #0f172a;
+      --text-muted: #475569;
+      --border-slate: #e2e8f0;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #e0e7ff;
+      --accent-green: #059669;
+      --accent-green-bg: #ecfdf5;
+      --accent-red: #dc2626;
+      --accent-red-bg: #fef2f2;
+      --accent-blue: #2563eb;
+      --accent-blue-bg: #eff6ff;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
       --radius: 8px;
-      --radius-sm: 6px;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-      --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-      --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
     }
-
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to   { transform: translateX(0);    opacity: 1; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to   { opacity: 0; transform: translateY(-6px); }
-    }
-
     body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 13.5px;
-      line-height: 1.6;
-    }
-
-    /* ── Alert Banner (Notification Toast) ── */
-    .alert-banner {
-      position: fixed;
-      top: 1.25rem;
-      right: 1.25rem;
-      z-index: 9999;
-      min-width: 300px;
-      max-width: 420px;
-      border-radius: var(--radius);
-      padding: 0.875rem 1rem;
-      font-size: 0.85rem;
-      font-weight: 500;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.625rem;
-      border: 1px solid transparent;
-      box-shadow: var(--shadow-md);
-      animation: slideIn 0.25s ease;
-      cursor: pointer;
-    }
-    .alert-banner.success { background: var(--green-light); border-color: var(--green-border); color: var(--green); }
-    .alert-banner.error   { background: var(--red-light);   border-color: var(--red-border);   color: var(--red); }
-    .alert-banner.info    { background: var(--accent-light); border-color: #bfdbfe; color: var(--accent-dark); }
-    .alert-banner.warning { background: var(--orange-light); border-color: var(--orange-border); color: var(--orange); }
-    .alert-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
-    .alert-text { flex: 1; line-height: 1.4; }
-    .alert-close { opacity: 0.5; font-size: 1rem; flex-shrink: 0; transition: opacity 0.15s; }
-    .alert-close:hover { opacity: 1; }
-    #alert-container { position: fixed; top: 1.25rem; right: 1.25rem; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-
-    /* ── Header ── */
-    .topbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      height: 54px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center;
-      padding: 0 24px; gap: 12px;
-    }
-    .topbar-logo {
-      display: flex; align-items: center; gap: 8px;
-      font-weight: 600; font-size: 14px; color: var(--text);
-    }
-    .logo-box {
-      width: 26px; height: 26px; border-radius: 6px;
-      background: var(--accent); display: flex; align-items: center; justify-content: center;
-    }
-    .logo-box svg { width: 14px; height: 14px; color: #fff; }
-    .topbar-sep { width: 1px; height: 18px; background: var(--border); }
-    .topbar-sub { font-size: 12px; color: var(--text-3); }
-    .topbar-space { flex: 1; }
-    .api-status {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 12px; font-weight: 500; color: var(--green);
-    }
-    .api-status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
-
-    /* ── Layout ── */
-    .layout { display: flex; padding-top: 54px; min-height: 100vh; }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      width: 220px; flex-shrink: 0;
-      background: var(--surface); border-right: 1px solid var(--border);
-      position: fixed; top: 54px; bottom: 0; overflow-y: auto;
-      padding: 16px 10px;
-    }
-    .nav-group { margin-bottom: 24px; }
-    .nav-group-label {
-      font-size: 10.5px; font-weight: 600; color: var(--text-3);
-      text-transform: uppercase; letter-spacing: 0.6px;
-      padding: 0 8px; margin-bottom: 4px;
-    }
-    .nav-link {
-      display: flex; align-items: center; gap: 9px;
-      padding: 7px 8px; border-radius: var(--radius-sm);
-      font-size: 13px; color: var(--text-2);
-      cursor: pointer; user-select: none;
-      transition: background 0.12s, color 0.12s;
-    }
-    .nav-link:hover { background: var(--bg); color: var(--text); }
-    .nav-link.active { background: var(--accent-light); color: var(--accent-dark); font-weight: 500; }
-    .nav-link svg { width: 15px; height: 15px; flex-shrink: 0; }
-
-    /* ── Main content ── */
-    .main { margin-left: 220px; flex: 1; padding: 28px 28px; max-width: 1080px; }
-
-    /* ── Page sections ── */
-    .section { display: none; }
-    .section.active { display: block; }
-
-    .page-head { margin-bottom: 20px; }
-    .page-title { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
-    .page-subtitle { font-size: 12.5px; color: var(--text-2); }
-
-    /* ── Card ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 20px;
-    }
-    .card-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border);
-    }
-    .card-title { font-size: 13px; font-weight: 600; }
-    .card-badge {
-      font-size: 11px; font-family: 'Courier New', monospace;
-      background: var(--surface-2); border: 1px solid var(--border);
-      padding: 2px 8px; border-radius: 4px; color: var(--text-2);
-    }
-    .card-body { padding: 18px; }
-
-    /* ── Two-column grid ── */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
-
-    /* ── Forms ── */
-    .field { margin-bottom: 13px; }
-    .field:last-child { margin-bottom: 0; }
-    .field label {
-      display: block; font-size: 12px; font-weight: 500;
-      color: var(--text-2); margin-bottom: 5px;
-    }
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-    input[type="text"], input[type="number"], select, textarea {
-      width: 100%; background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 8px 10px;
-      font-size: 13px; font-family: inherit; color: var(--text);
-      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
-    }
-    input::placeholder, textarea::placeholder { color: var(--text-3); }
-    select option { background: #fff; }
-    textarea {
-      resize: vertical; min-height: 64px;
-      font-family: 'Courier New', monospace; font-size: 12.5px;
-    }
-    .field-hint {
-      font-size: 11.5px; color: var(--text-3); margin-top: 4px;
-    }
-
-    /* ── Buttons ── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 14px; border-radius: var(--radius-sm);
-      font-size: 13px; font-weight: 500; font-family: inherit;
-      border: 1px solid transparent; cursor: pointer; outline: none;
-      transition: all 0.15s;
-    }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent-dark); }
-    .btn-primary:hover:not(:disabled) { background: var(--accent-dark); }
-    .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
-    .btn-secondary:hover:not(:disabled) { background: var(--surface-2); }
-    .btn-success { background: var(--green); color: #fff; border-color: #15803d; }
-    .btn-success:hover:not(:disabled) { background: #15803d; }
-    .btn-sm { padding: 5px 10px; font-size: 12px; }
-    .btn-block { width: 100%; justify-content: center; }
-
-    /* ── Session rows ── */
-    .session-row {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 12px;
-      margin-bottom: 8px;
-      background: var(--surface-2);
-    }
-    .session-row-inner {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: end;
-    }
-    .session-row-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .remove-row-btn {
-      padding: 7px 10px; border-radius: var(--radius-sm);
-      border: 1px solid var(--border); background: var(--surface);
-      color: var(--text-3); cursor: pointer; font-size: 13px;
-      transition: border-color 0.15s, color 0.15s; line-height: 1;
-    }
-    .remove-row-btn:hover { border-color: var(--red-border); color: var(--red); }
-
-    /* ── Response block ── */
-    .response-block { margin-top: 14px; display: none; }
-    .response-block.show { display: block; }
-    .response-status {
-      display: flex; align-items: center; gap: 6px;
-      padding: 7px 12px; font-size: 11.5px; font-weight: 500;
-      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-    }
-    .response-status.ok { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); border-bottom: none; }
-    .response-status.err { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); border-bottom: none; }
-    .response-body {
-      background: #1a1a2e; color: #a8c1f0;
-      font-family: 'Courier New', monospace; font-size: 11.5px;
-      padding: 12px 14px; border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-      border: 1px solid #2d2d4e;
-      overflow-x: auto; max-height: 240px; overflow-y: auto;
-      white-space: pre;
-    }
-
-    /* ── Table ── */
-    .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th {
-      text-align: left; padding: 9px 14px;
-      background: var(--surface-2); color: var(--text-2);
-      font-weight: 500; font-size: 11.5px;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-    td {
-      padding: 10px 14px; border-bottom: 1px solid var(--border);
-      color: var(--text); vertical-align: top;
-    }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--bg); }
-    .td-mono { font-family: 'Courier New', monospace; font-size: 11.5px; color: var(--text-2); }
-    .td-sub { font-size: 12px; color: var(--text-2); }
-
-    /* ── Badges ── */
-    .badge {
-      display: inline-flex; align-items: center;
-      padding: 2px 8px; border-radius: 4px;
-      font-size: 11px; font-weight: 500; white-space: nowrap;
-    }
-    .badge-blue { background: var(--accent-light); color: var(--accent-dark); }
-    .badge-green { background: var(--green-light); color: var(--green); }
-    .badge-red { background: var(--red-light); color: var(--red); }
-    .badge-gray { background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border); }
-    .badge-orange { background: var(--orange-light); color: var(--orange); }
-
-    /* ── Pill selectors (parent chooser) ── */
-    .pill-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-    .pill {
-      padding: 5px 12px; border-radius: 20px;
-      border: 1px solid var(--border); background: var(--surface);
-      color: var(--text-2); font-size: 12px; font-weight: 500;
-      cursor: pointer; transition: all 0.15s; user-select: none;
-    }
-    .pill.active { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
-    .pill:hover:not(.active) { border-color: var(--text-3); color: var(--text); }
-
-    /* ── Empty state ── */
-    .empty-state {
-      text-align: center; padding: 40px 16px;
-      color: var(--text-3);
-    }
-    .empty-title { font-size: 13px; font-weight: 500; color: var(--text-2); margin-bottom: 4px; }
-    .empty-desc { font-size: 12px; }
-
-    /* ── Copy link ── */
-    .copy-link {
-      font-family: 'Courier New', monospace; font-size: 11.5px;
-      color: var(--text-2); cursor: pointer;
-    }
-    .copy-link:hover { color: var(--accent-dark); text-decoration: underline; }
-
-    /* ── Divider ── */
-    .divider { height: 1px; background: var(--border); margin: 16px 0; }
-
-    /* ── Info note ── */
-    .note {
-      background: var(--accent-light); border: 1px solid #bfdbfe;
-      border-radius: var(--radius-sm); padding: 10px 12px;
-      font-size: 12px; color: var(--text-2); margin-bottom: 14px;
+      background-color: var(--bg-slate);
+      color: var(--text-dark);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 0;
       line-height: 1.5;
     }
-    .note strong { color: var(--accent-dark); }
+    .app-layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+    /* Enterprise Header */
+    .app-header {
+      background: var(--bg-white);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .brand-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.02em;
+    }
+    .brand-subtitle {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+    .system-health {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent-green-bg);
+      border: 1px solid rgba(5, 150, 105, 0.15);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-green);
+    }
+    .health-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-green);
+      border-radius: 50%;
+    }
+    /* Profile Switcher Bar */
+    .profile-bar {
+      background: var(--bg-white);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius);
+      padding: 1rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+    }
+    .profile-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .profile-selector label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .profile-selector select {
+      background: var(--bg-slate);
+      border: 1px solid var(--border-slate);
+      border-radius: 6px;
+      padding: 0.45rem 1.75rem 0.45rem 0.75rem;
+      color: var(--text-dark);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .profile-selector select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+    /* Notification Toasts */
+    .alert-banner {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      min-width: 320px;
+      max-width: 450px;
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+      align-items: flex-start;
+      gap: 0.75rem;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .alert-success {
+      background-color: var(--accent-green-bg);
+      border-color: rgba(5, 150, 105, 0.15);
+      color: var(--accent-green);
+    }
+    .alert-danger {
+      background-color: var(--accent-red-bg);
+      border-color: rgba(220, 38, 38, 0.15);
+      color: var(--accent-red);
+    }
+    .alert-banner .alert-close {
+      margin-left: auto;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-weight: 700;
+      color: inherit;
+      opacity: 0.7;
+    }
+    .alert-banner .alert-close:hover {
+      opacity: 1;
+    }
+    /* Navigation Tabs */
+    .tab-navigation {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid var(--border-slate);
+      margin-bottom: 2.25rem;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    /* Grid Layouts */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 992px) {
+      .grid-layout-2 {
+        grid-template-columns: 420px 1fr;
+      }
+      .grid-layout-equal {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    /* Enterprise Cards */
+    .card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-slate);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.5rem;
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    /* Form Design */
+    .form-group {
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    input, select {
+      background: var(--bg-white);
+      border: 1px solid var(--border-slate);
+      border-radius: 6px;
+      padding: 0.6rem 0.85rem;
+      color: var(--text-dark);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      outline: none;
+      width: 100%;
+    }
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+    input:disabled, select:disabled {
+      background: var(--bg-slate);
+      opacity: 0.75;
+      cursor: not-allowed;
+    }
+    .input-helper {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    /* Buttons */
+    .btn {
+      background-color: var(--primary);
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 0.65rem 1.25rem;
+      color: var(--bg-white);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+    .btn-secondary {
+      background-color: var(--bg-white);
+      border: 1px solid var(--border-slate);
+      color: var(--text-dark);
+    }
+    .btn-secondary:hover {
+      background-color: var(--bg-slate);
+    }
+    .btn-danger {
+      background-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: #b91c1c;
+    }
+    /* Table Design */
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid var(--border-slate);
+      border-radius: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+    th {
+      background: var(--bg-slate);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-slate);
+    }
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-slate);
+      color: var(--text-dark);
+      vertical-align: middle;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    /* Badge Indicators */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      line-height: 1;
+    }
+    .badge-success { background: var(--accent-green-bg); color: var(--accent-green); border: 1px solid rgba(5, 150, 105, 0.1); }
+    .badge-danger { background: var(--accent-red-bg); color: var(--accent-red); border: 1px solid rgba(220, 38, 38, 0.1); }
+    .badge-info { background: var(--accent-blue-bg); color: var(--accent-blue); border: 1px solid rgba(37, 99, 235, 0.1); }
+    /* Session List styling */
+    .session-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .session-card {
+      background: var(--bg-slate);
+      border: 1px solid var(--border-slate);
+      border-left: 3px solid var(--primary);
+      border-radius: 4px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    /* Diagnostics Log Screen */
+    .terminal-console {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: var(--radius);
+      padding: 1rem;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      max-height: 480px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .console-heading {
+      color: #94a3b8;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .console-line { color: #cbd5e1; margin-bottom: 0.25rem; word-break: break-all; }
+    .console-success { color: #34d399; font-weight: 500; margin-bottom: 0.25rem; }
+    .console-error { color: #f87171; font-weight: 500; margin-bottom: 0.25rem; }
+    .console-info { color: #60a5fa; margin-bottom: 0.25rem; }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-slate); }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
 <body>
-
-<!-- Alert container -->
-<div id="alert-container"></div>
-
-<!-- Topbar -->
-<header class="topbar">
-  <div class="topbar-logo">
-    <div class="logo-box">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="1" y="2" width="14" height="12" rx="1.5"/>
-        <path d="M1 6h14M5 10h6"/>
-      </svg>
+  <div class="app-layout">
+    
+    <!-- Dynamic Alert Banner Toast -->
+    <div id="toast-banner" class="alert-banner">
+      <span id="toast-msg"></span>
+      <button class="alert-close" onclick="closeToast()">✕</button>
     </div>
-    Class Scheduler
+    <!-- Application Top Header -->
+    <header class="app-header">
+      <div>
+        <h1 class="brand-title">Global Class Scheduler & Booking Portal</h1>
+        <p class="brand-subtitle">Production-Grade Enterprise Scheduling & Safe Concurrency Booking System</p>
+      </div>
+      <div class="system-health">
+        <div class="health-dot"></div>
+        <span id="health-text">Connecting to Backend...</span>
+      </div>
+    </header>
+    <!-- Global Persona Context Picker -->
+    <div class="profile-bar">
+      <div class="profile-selector">
+        <label for="select-active-teacher">Active Teacher Context</label>
+        <select id="select-active-teacher" onchange="onTeacherChange()"></select>
+      </div>
+      <div class="profile-selector">
+        <label for="select-active-parent">Active Parent Context</label>
+        <select id="select-active-parent" onchange="onParentChange()"></select>
+      </div>
+    </div>
+    <!-- Workspace Navigation -->
+    <nav class="tab-navigation">
+      <button id="btn-tab-parent" class="tab-btn active" onclick="switchTab('parent-workspace')">Parent Workspace</button>
+      <button id="btn-tab-teacher" class="tab-btn" onclick="switchTab('teacher-workspace')">Teacher Workspace</button>
+    </nav>
+    <!-- TAB 1: PARENT WORKSPACE -->
+    <section id="parent-workspace" class="tab-panel active">
+      <div class="grid-layout grid-layout-2">
+        
+        <!-- Left Side: Class Explorer -->
+        <div class="card" style="margin-bottom: 0;">
+          <div class="card-title">
+            <span>Browse Available Classes</span>
+            <div style="width: auto;">
+              <select id="select-parent-timezone" onchange="loadOfferings()" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; min-width: 180px;">
+                <option value="UTC">UTC (Greenwich Mean Time)</option>
+                <option value="America/New_York">America/New_York (Eastern Time)</option>
+                <option value="Asia/Kolkata">Asia/Kolkata (India Standard Time)</option>
+                <option value="Europe/London">Europe/London (London Time)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="avail-offerings-box" style="display: flex; flex-direction: column; gap: 1rem;">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Loading available classes...</p>
+          </div>
+        </div>
+        <!-- Right Side: Parent Bookings -->
+        <div class="card" style="margin-bottom: 0;">
+          <div class="card-title">
+            <span id="label-parent-bookings">Your Enrolled Bookings</span>
+          </div>
+          
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Course & Section</th>
+                  <th>Teacher</th>
+                  <th>Schedules</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="parent-bookings-table-body">
+                <tr>
+                  <td colspan="4" style="color: var(--text-muted); text-align: center; padding: 2rem;">
+                    Select a parent profile above to list their enrolled classes.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- TAB 2: TEACHER WORKSPACE -->
+    <section id="teacher-workspace" class="tab-panel">
+      <div class="grid-layout grid-layout-2">
+        
+        <!-- Left Side: Teacher Actions -->
+        <div>
+          <!-- Create Offering Card -->
+          <div class="card">
+            <div class="card-title">Create Class Section</div>
+            <form id="create-offering-form">
+              <div class="form-group">
+                <label for="select-course">Course Catalog</label>
+                <select id="select-course" required></select>
+              </div>
+              <div class="form-group">
+                <label for="input-offering-name">Class Section Name</label>
+                <input type="text" id="input-offering-name" value="Saturday Batch" required>
+              </div>
+              <div class="form-group">
+                <label for="input-capacity">Enrolled Student Capacity</label>
+                <input type="number" id="input-capacity" value="5" min="1" required>
+              </div>
+              <button type="submit" class="btn">Create Class Section</button>
+            </form>
+          </div>
+          <!-- Add Sessions Card -->
+          <div class="card" style="margin-bottom: 0;">
+            <div class="card-title">Schedule Session Intervals</div>
+            <form id="schedule-sessions-form">
+              <div class="form-group">
+                <label for="select-teacher-offering">Target Class Section</label>
+                <select id="select-teacher-offering" required>
+                  <option value="">-- Create a class section first --</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="select-teacher-timezone">Teacher Timezone</label>
+                <select id="select-teacher-timezone">
+                  <option value="Asia/Kolkata">Asia/Kolkata (India Standard Time)</option>
+                  <option value="UTC">UTC (Greenwich Mean Time)</option>
+                  <option value="America/New_York">America/New_York (Eastern Time)</option>
+                  <option value="Europe/London">Europe/London (London Time)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="sess1-start">Session 1 Timing</label>
+                <input type="text" id="sess1-start" value="2026-06-06 18:00:00" style="font-family: monospace;" required>
+                <span class="input-helper">Format: YYYY-MM-DD HH:MM:SS</span>
+              </div>
+              <div class="form-group">
+                <label for="sess2-start">Session 2 Timing</label>
+                <input type="text" id="sess2-start" value="2026-06-13 18:00:00" style="font-family: monospace;" required>
+                <span class="input-helper">Format: YYYY-MM-DD HH:MM:SS</span>
+              </div>
+              <button type="submit" class="btn">Schedule Sessions</button>
+            </form>
+          </div>
+        </div>
+        <!-- Right Side: Teacher Scheduled Sections -->
+        <div class="card" style="margin-bottom: 0;">
+          <div class="card-title">
+            <span id="label-teacher-offerings">Your Scheduled Class Offerings</span>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Offering Name</th>
+                  <th>Course Catalog</th>
+                  <th>Capacity</th>
+                  <th>Sessions</th>
+                </tr>
+              </thead>
+              <tbody id="teacher-offerings-table-body">
+                <tr>
+                  <td colspan="4" style="color: var(--text-muted); text-align: center; padding: 2rem;">
+                    Select a teacher profile above to list their scheduled classes.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-  <div class="topbar-sep"></div>
-  <span class="topbar-sub">undoSchool — Admin</span>
-  <div class="topbar-space"></div>
-  <div class="api-status">
-    <div class="api-status-dot"></div>
-    API Online
-  </div>
-</header>
-
-<!-- Layout -->
-<div class="layout">
-
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="nav-group">
-      <div class="nav-group-label">Teacher</div>
-      <div class="nav-link active" data-section="create-offering" onclick="navigate(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="1.5" y="1.5" width="13" height="13" rx="1.5"/><path d="M5 8h6M8 5v6"/></svg>
-        Create Offering
-      </div>
-      <div class="nav-link" data-section="add-sessions" onclick="navigate(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M8 5v6M5 8h6"/></svg>
-        Add Sessions
-      </div>
-      <div class="nav-link" data-section="view-schedule" onclick="navigate(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5l2 1.5"/></svg>
-        View Schedule
-      </div>
-    </div>
-    <div class="nav-group">
-      <div class="nav-group-label">Parent</div>
-      <div class="nav-link" data-section="browse" onclick="navigate(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 4h12M2 8h9M2 12h7"/></svg>
-        Browse Offerings
-      </div>
-      <div class="nav-link" data-section="book" onclick="navigate(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V3a1 1 0 00-1-1z"/><path d="M5 7.5l2 2 4-4"/></svg>
-        Book Offering
-      </div>
-      <div class="nav-link" data-section="my-bookings" onclick="navigate(this)">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="1.5" y="1.5" width="13" height="13" rx="1.5"/><path d="M4 6h8M4 9h6M4 12h4"/></svg>
-        My Bookings
-      </div>
-    </div>
-  </aside>
-
-  <!-- Main -->
-  <main class="main">
-
-    <!-- ── Create Offering ── -->
-    <div id="sec-create-offering" class="section active">
-      <div class="page-head">
-        <div class="page-title">Create Class Offering</div>
-        <div class="page-subtitle">Register a new course section with a teacher and seat capacity.</div>
-      </div>
-      <div class="card" style="max-width: 520px">
-        <div class="card-header">
-          <span class="card-title">New Offering</span>
-          <span class="card-badge">POST /api/teachers/offerings</span>
-        </div>
-        <div class="card-body">
-          <div class="field">
-            <label>Teacher</label>
-            <select id="co-teacher"><option value="">Loading...</option></select>
-          </div>
-          <div class="field">
-            <label>Course</label>
-            <select id="co-course"><option value="">Loading...</option></select>
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label>Offering Name</label>
-              <input type="text" id="co-name" placeholder="e.g. Saturday Batch A" />
-            </div>
-            <div class="field">
-              <label>Capacity</label>
-              <input type="number" id="co-capacity" value="10" min="1" />
-            </div>
-          </div>
-          <div class="divider"></div>
-          <button class="btn btn-primary btn-block" onclick="createOffering()">Create Offering</button>
-          <div id="co-response" class="response-block"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Add Sessions ── -->
-    <div id="sec-add-sessions" class="section">
-      <div class="page-head">
-        <div class="page-title">Add Sessions to Offering</div>
-        <div class="page-subtitle">Schedule one or more class sessions for an existing offering.</div>
-      </div>
-      <div class="card" style="max-width: 680px">
-        <div class="card-header">
-          <span class="card-title">Session Schedule</span>
-          <span class="card-badge">POST /api/teachers/offerings/:id/sessions</span>
-        </div>
-        <div class="card-body">
-          <div class="field-row">
-            <div class="field">
-              <label>Teacher</label>
-              <select id="as-teacher"><option value="">Loading...</option></select>
-            </div>
-            <div class="field">
-              <label>Teacher Timezone</label>
-              <select id="as-tz">
-                <option value="Asia/Kolkata">Asia/Kolkata (IST +5:30)</option>
-                <option value="UTC">UTC</option>
-                <option value="America/New_York">America/New_York (EDT)</option>
-                <option value="Europe/London">Europe/London (BST)</option>
-                <option value="America/Los_Angeles">America/Los_Angeles (PDT)</option>
-              </select>
-            </div>
-          </div>
-          <div class="field">
-            <label>Offering ID</label>
-            <input type="text" id="as-offering-id" placeholder="Paste UUID from Create Offering" />
-          </div>
-          <div class="divider"></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-            <span style="font-size:12px;font-weight:500;color:var(--text-2)">Sessions</span>
-            <button class="btn btn-secondary btn-sm" onclick="addSessionRow()">+ Add Row</button>
-          </div>
-          <div class="note">
-            Enter times as <strong>YYYY-MM-DD HH:MM:SS</strong> in the teacher's timezone (e.g. <code style="font-family:monospace;background:rgba(59,130,246,0.08);padding:1px 4px;border-radius:3px">2026-06-10 18:00:00</code>). End time auto-fills +1 hour.
-          </div>
-          <div id="session-list"></div>
-          <button class="btn btn-primary btn-block" style="margin-top:6px" onclick="submitSessions()">Add Sessions</button>
-          <div id="as-response" class="response-block"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── View Schedule ── -->
-    <div id="sec-view-schedule" class="section">
-      <div class="page-head">
-        <div class="page-title">Teacher Schedule</div>
-        <div class="page-subtitle">All offerings and scheduled sessions for a selected teacher.</div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Offerings &amp; Sessions</span>
-          <span class="card-badge">GET /api/teachers/:id/offerings</span>
-        </div>
-        <div class="card-body">
-          <div style="display:flex;gap:10px;align-items:flex-end">
-            <div class="field" style="margin:0;flex:1;max-width:260px">
-              <label>Teacher</label>
-              <select id="vs-teacher"><option value="">Select teacher...</option></select>
-            </div>
-            <button class="btn btn-primary" onclick="loadSchedule()">Load</button>
-          </div>
-        </div>
-        <div id="vs-result">
-          <div class="empty-state">
-            <div class="empty-title">Select a teacher and click Load</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Browse Offerings ── -->
-    <div id="sec-browse" class="section">
-      <div class="page-head">
-        <div class="page-title">Browse Offerings</div>
-        <div class="page-subtitle">Available class offerings with session times shown in your timezone. Click any ID to copy it.</div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Available Offerings</span>
-          <span class="card-badge">GET /api/parents/offerings?timezone=...</span>
-        </div>
-        <div class="card-body">
-          <div style="display:flex;gap:10px;align-items:flex-end">
-            <div class="field" style="margin:0;flex:1;max-width:260px">
-              <label>Your Timezone</label>
-              <select id="browse-tz">
-                <option value="Asia/Kolkata">Asia/Kolkata (IST +5:30)</option>
-                <option value="UTC">UTC</option>
-                <option value="America/New_York">America/New_York (EDT)</option>
-                <option value="Europe/London">Europe/London (BST)</option>
-                <option value="America/Los_Angeles">America/Los_Angeles (PDT)</option>
-              </select>
-            </div>
-            <button class="btn btn-primary" onclick="browseOfferings()">Load</button>
-          </div>
-        </div>
-        <div id="browse-result">
-          <div class="empty-state">
-            <div class="empty-title">Click Load to fetch offerings</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Book Offering ── -->
-    <div id="sec-book" class="section">
-      <div class="page-head">
-        <div class="page-title">Book a Class Offering</div>
-        <div class="page-subtitle">Register a parent for an available offering. Enforced with DB-level concurrency locks.</div>
-      </div>
-      <div class="card" style="max-width: 520px">
-        <div class="card-header">
-          <span class="card-title">New Booking</span>
-          <span class="card-badge">POST /api/parents/bookings</span>
-        </div>
-        <div class="card-body">
-          <div class="field">
-            <label>Select Parent</label>
-            <div class="pill-group" id="parent-pills"></div>
-            <input type="hidden" id="book-parent-id" />
-          </div>
-          <div class="field">
-            <label>Offering ID</label>
-            <input type="text" id="book-offering-id" placeholder="Paste offering UUID" />
-            <div class="field-hint">Go to Browse Offerings and click any ID to copy it here.</div>
-          </div>
-          <div class="divider"></div>
-          <button class="btn btn-success btn-block" onclick="bookOffering()">Confirm Booking</button>
-          <div id="book-response" class="response-block"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── My Bookings ── -->
-    <div id="sec-my-bookings" class="section">
-      <div class="page-head">
-        <div class="page-title">My Bookings</div>
-        <div class="page-subtitle">View all bookings for a parent with session times shown in any timezone.</div>
-      </div>
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Booking History</span>
-          <span class="card-badge">GET /api/parents/:id/bookings?timezone=...</span>
-        </div>
-        <div class="card-body">
-          <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-            <div class="field" style="margin:0;flex:1;min-width:180px">
-              <label>Parent</label>
-              <select id="mb-parent"><option value="">Select parent...</option></select>
-            </div>
-            <div class="field" style="margin:0;flex:1;min-width:180px">
-              <label>Timezone</label>
-              <select id="mb-tz">
-                <option value="Asia/Kolkata">Asia/Kolkata (IST +5:30)</option>
-                <option value="UTC">UTC</option>
-                <option value="America/New_York">America/New_York (EDT)</option>
-                <option value="Europe/London">Europe/London (BST)</option>
-                <option value="America/Los_Angeles">America/Los_Angeles (PDT)</option>
-              </select>
-            </div>
-            <button class="btn btn-primary" onclick="loadBookings()">Load</button>
-          </div>
-        </div>
-        <div id="mb-result">
-          <div class="empty-state">
-            <div class="empty-title">Select a parent and click Load</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </main>
-</div>
-
-<script>
-// ── State ─────────────────────────────────────────────────────────
-let meta = { teachers: [], parents: [], courses: [] };
-
-// ── Navigation ────────────────────────────────────────────────────
-function navigate(linkEl) {
-  const target = linkEl.dataset.section;
-  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-  document.getElementById('sec-' + target).classList.add('active');
-  linkEl.classList.add('active');
-}
-
-// ── Alert Banner ──────────────────────────────────────────────────
-function showAlert(message, type = 'info') {
-  const icons = { success: '✓', error: '✕', info: 'ℹ', warning: '⚠' };
-  const container = document.getElementById('alert-container');
-  const el = document.createElement('div');
-  el.className = `alert-banner ${type}`;
-  el.innerHTML = `
-    <span class="alert-icon">${icons[type] || 'ℹ'}</span>
-    <span class="alert-text">${message}</span>
-    <span class="alert-close" onclick="this.parentElement.remove()">✕</span>
-  `;
-  container.appendChild(el);
-  setTimeout(() => {
-    el.style.animation = 'fadeOut 0.3s ease forwards';
-    setTimeout(() => el.remove(), 300);
-  }, 4000);
-}
-
-// ── Response block ────────────────────────────────────────────────
-function showResponse(id, data, ok) {
-  const el = document.getElementById(id);
-  el.classList.add('show');
-  el.innerHTML = `
-    <div class="response-status ${ok ? 'ok' : 'err'}">${ok ? '✓ Success' : '✗ Error'}</div>
-    <div class="response-body">${JSON.stringify(data, null, 2)}</div>
-  `;
-}
-
-// ── API helper ────────────────────────────────────────────────────
-async function api(method, path, body) {
-  try {
-    const r = await fetch(path, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: body ? JSON.stringify(body) : undefined
+  <!-- Administration Portal Operations Javascript -->
+  <script>
+    let seedData = { teachers: [], parents: [], courses: [] };
+    window.addEventListener("DOMContentLoaded", async () => {
+      await getHealth();
+      await getMetadata();
     });
-    const d = await r.json();
-    return { ok: r.ok, status: r.status, data: d };
-  } catch (e) {
-    return { ok: false, status: 0, data: { error: e.message } };
-  }
-}
-
-// ── Helpers ───────────────────────────────────────────────────────
-function fillSelect(id, items, labelFn, valueFn, placeholder) {
-  const el = document.getElementById(id);
-  el.innerHTML = `<option value="">${placeholder || 'Select...'}</option>`;
-  items.forEach(item => {
-    const o = document.createElement('option');
-    o.value = valueFn(item);
-    o.textContent = labelFn(item);
-    el.appendChild(o);
-  });
-}
-
-function fmt(iso) {
-  if (!iso) return '—';
-  try { return new Date(iso).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }); }
-  catch { return iso; }
-}
-
-function copyToClipboard(text, label) {
-  navigator.clipboard.writeText(text)
-    .then(() => showAlert(`${label || 'ID'} copied to clipboard`, 'info'))
-    .catch(() => showAlert('Copy failed — please copy manually', 'error'));
-}
-
-// ── Session datetime parser ────────────────────────────────────────
-// Accepts: "YYYY-MM-DD HH:MM:SS"
-// Returns: end time string (+1 hour, same format)
-function computeEndTime(strDate) {
-  if (!strDate || !strDate.trim()) {
-    throw new Error('Session timing cannot be empty.');
-  }
-  if (!strDate.includes(' ') || strDate.trim().split(' ').length < 2) {
-    throw new Error(`Invalid format: "${strDate}". Use YYYY-MM-DD HH:MM:SS (e.g. 2026-06-10 18:00:00).`);
-  }
-  const cleanDateStr = strDate.trim().replace(' ', 'T');
-  const dt = new Date(cleanDateStr);
-  if (isNaN(dt.getTime())) {
-    throw new Error(`Invalid date/time: "${strDate}". Use YYYY-MM-DD HH:MM:SS format.`);
-  }
-  dt.setHours(dt.getHours() + 1);
-  const pad = n => String(n).padStart(2, '0');
-  return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
-}
-
-// ── Session row builder ───────────────────────────────────────────
-let rowCount = 0;
-
-function addSessionRow() {
-  const id = ++rowCount;
-  const list = document.getElementById('session-list');
-  const row = document.createElement('div');
-  row.className = 'session-row';
-  row.id = `session-row-${id}`;
-  row.innerHTML = `
-    <div class="session-row-inner">
-      <div class="session-row-fields">
-        <div class="field" style="margin:0">
-          <label>Start Time</label>
-          <input type="text" id="s-start-${id}" placeholder="2026-06-10 18:00:00"
-            oninput="autoFillEnd(${id})" />
-          <div class="field-hint">YYYY-MM-DD HH:MM:SS</div>
-        </div>
-        <div class="field" style="margin:0">
-          <label>End Time <span style="color:var(--text-3);font-weight:400">(auto +1h)</span></label>
-          <input type="text" id="s-end-${id}" placeholder="Auto-filled" />
-        </div>
-      </div>
-      ${id > 1 ? `<button class="remove-row-btn" onclick="document.getElementById('session-row-${id}').remove()">✕</button>` : '<div></div>'}
-    </div>
-  `;
-  list.appendChild(row);
-}
-
-function autoFillEnd(id) {
-  const startVal = document.getElementById(`s-start-${id}`).value;
-  if (!startVal || startVal.length < 19) return;
-  try {
-    const end = computeEndTime(startVal);
-    document.getElementById(`s-end-${id}`).value = end;
-  } catch (_) {}
-}
-
-// ── Load metadata ─────────────────────────────────────────────────
-async function init() {
-  const { ok, data } = await api('GET', '/api/metadata');
-  if (!ok) { showAlert('Failed to connect to the API — is the server running?', 'error'); return; }
-  meta = data.data;
-
-  fillSelect('co-teacher', meta.teachers, t => t.name, t => t.id);
-  fillSelect('co-course',  meta.courses,  c => c.title, c => c.id);
-  fillSelect('as-teacher', meta.teachers, t => t.name, t => t.id);
-  fillSelect('vs-teacher', meta.teachers, t => t.name, t => t.id, 'Select teacher...');
-  fillSelect('mb-parent',  meta.parents,  p => `${p.name}`, p => p.id, 'Select parent...');
-
-  // Parent pills
-  const pills = document.getElementById('parent-pills');
-  meta.parents.forEach((p, i) => {
-    const el = document.createElement('div');
-    el.className = 'pill' + (i === 0 ? ' active' : '');
-    el.textContent = p.name.split(' ')[0];
-    el.title = p.email;
-    el.onclick = () => {
-      document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
-      el.classList.add('active');
-      document.getElementById('book-parent-id').value = p.id;
-    };
-    if (i === 0) document.getElementById('book-parent-id').value = p.id;
-    pills.appendChild(el);
-  });
-
-  // Add first session row by default
-  addSessionRow();
-
-  showAlert('Dashboard loaded — teachers, courses, and parents ready.', 'success');
-}
-
-// ── Create Offering ───────────────────────────────────────────────
-async function createOffering() {
-  const teacherId = document.getElementById('co-teacher').value;
-  const courseId  = document.getElementById('co-course').value;
-  const name      = document.getElementById('co-name').value.trim();
-  const capacity  = parseInt(document.getElementById('co-capacity').value) || 10;
-
-  if (!teacherId) { showAlert('Please select a teacher.', 'warning'); return; }
-  if (!courseId)  { showAlert('Please select a course.', 'warning'); return; }
-  if (!name)      { showAlert('Offering name cannot be empty.', 'warning'); return; }
-
-  const { ok, data } = await api('POST', '/api/teachers/offerings', { teacherId, courseId, name, capacity });
-  showResponse('co-response', data, ok);
-
-  if (ok) {
-    const id = data.data?.id;
-    showAlert(`Offering "${name}" created successfully.`, 'success');
-    if (id) {
-      document.getElementById('as-offering-id').value = id;
-      document.getElementById('book-offering-id').value = id;
+    // Close notifications
+    function closeToast() {
+      document.getElementById("toast-banner").style.display = "none";
     }
-  } else {
-    showAlert(data.error || 'Failed to create offering.', 'error');
-  }
-}
-
-// ── Add Sessions ──────────────────────────────────────────────────
-async function submitSessions() {
-  const teacherId  = document.getElementById('as-teacher').value;
-  const offeringId = document.getElementById('as-offering-id').value.trim();
-  const timezone   = document.getElementById('as-tz').value;
-
-  if (!teacherId)  { showAlert('Please select a teacher.', 'warning'); return; }
-  if (!offeringId) { showAlert('Please enter an Offering ID.', 'warning'); return; }
-
-  const sessions = [];
-  let rowNum = 0;
-  for (const row of document.querySelectorAll('.session-row')) {
-    rowNum++;
-    const id   = row.id.replace('session-row-', '');
-    const start = document.getElementById(`s-start-${id}`)?.value?.trim();
-    const end   = document.getElementById(`s-end-${id}`)?.value?.trim();
-
-    if (!start && !end) continue; // skip empty rows
-
-    if (!start) { showAlert(`Row ${rowNum}: Start time is required.`, 'warning'); return; }
-
-    let endTime = end;
-    if (!endTime) {
-      try { endTime = computeEndTime(start); }
-      catch (e) { showAlert(`Row ${rowNum}: ${e.message}`, 'error'); return; }
+    // Show toast notifications
+    function showToast(message, isError = false) {
+      const banner = document.getElementById("toast-banner");
+      const msgSpan = document.getElementById("toast-msg");
+      
+      banner.className = isError ? "alert-banner alert-danger" : "alert-banner alert-success";
+      msgSpan.textContent = message;
+      banner.style.display = "flex";
+      // Auto close after 8 seconds
+      setTimeout(() => {
+        if (msgSpan.textContent === message) {
+          banner.style.display = "none";
+        }
+      }, 8000);
     }
-
-    // Validate start
-    try { computeEndTime(start); } // reuse parser to validate format
-    catch (e) { showAlert(`Row ${rowNum}: ${e.message}`, 'error'); return; }
-
-    sessions.push({ startTime: start, endTime });
-  }
-
-  if (sessions.length === 0) { showAlert('Add at least one session.', 'warning'); return; }
-
-  const { ok, data } = await api('POST', `/api/teachers/offerings/${offeringId}/sessions`, { teacherId, timezone, sessions });
-  showResponse('as-response', data, ok);
-
-  if (ok) showAlert(`${sessions.length} session(s) added successfully.`, 'success');
-  else    showAlert(data.error || 'Failed to add sessions.', 'error');
-}
-
-// ── Teacher Schedule ──────────────────────────────────────────────
-async function loadSchedule() {
-  const tid = document.getElementById('vs-teacher').value;
-  if (!tid) { showAlert('Please select a teacher.', 'warning'); return; }
-
-  const { ok, data } = await api('GET', `/api/teachers/${tid}/offerings`);
-  const container = document.getElementById('vs-result');
-
-  if (!ok) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-title">Error loading schedule</div></div>`;
-    return;
-  }
-
-  const offerings = data.data || [];
-  if (offerings.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-title">No offerings found for this teacher</div><div class="empty-desc">Create one from Teacher → Create Offering</div></div>`;
-    return;
-  }
-
-  container.innerHTML = `
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Offering</th>
-            <th>Offering ID</th>
-            <th>Capacity</th>
-            <th>Booked / Total</th>
-            <th>Sessions</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${offerings.map(o => `
+    // Tab switcher
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-panel").forEach(panel => {
+        panel.classList.remove("active");
+      });
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
+      document.getElementById(tabId).classList.add("active");
+      
+      if (tabId === 'parent-workspace') {
+        document.getElementById("btn-tab-parent").classList.add("active");
+        refreshParentWorkspace();
+      } else if (tabId === 'teacher-workspace') {
+        document.getElementById("btn-tab-teacher").classList.add("active");
+        refreshTeacherWorkspace();
+      }
+    }
+    // Backend connectivity check
+    async function getHealth() {
+      try {
+        const res = await fetch("/health");
+        const data = await res.json();
+        if (data.status === "success") {
+          document.getElementById("health-text").textContent = "Service Online";
+          document.querySelector(".system-health").style.backgroundColor = "var(--accent-green-bg)";
+          document.querySelector(".system-health").style.color = "var(--accent-green)";
+          document.querySelector(".health-dot").style.backgroundColor = "var(--accent-green)";
+        }
+      } catch {
+        document.getElementById("health-text").textContent = "Service Offline";
+        document.querySelector(".system-health").style.backgroundColor = "var(--accent-red-bg)";
+        document.querySelector(".system-health").style.color = "var(--accent-red)";
+        document.querySelector(".health-dot").style.backgroundColor = "var(--accent-red)";
+        showToast("Cannot connect to backend server. Make sure the Node server is listening on port 3000.", true);
+      }
+    }
+    // Load initial seeds catalog
+    async function getMetadata() {
+      try {
+        const res = await fetch("/api/metadata");
+        const data = await res.json();
+        seedData = data;
+        // Prefill Context Selector dropdowns
+        const teacherSelect = document.getElementById("select-active-teacher");
+        const parentSelect = document.getElementById("select-active-parent");
+        
+        teacherSelect.innerHTML = "";
+        data.teachers.forEach(t => {
+          teacherSelect.innerHTML += `<option value="${t.id}">${t.name} (${t.email})</option>`;
+        });
+        parentSelect.innerHTML = "";
+        data.parents.forEach(p => {
+          parentSelect.innerHTML += `<option value="${p.id}">${p.name} (${p.email})</option>`;
+        });
+        // Prefill Form Course options
+        const courseSelect = document.getElementById("select-course");
+        courseSelect.innerHTML = "";
+        data.courses.forEach(c => {
+          courseSelect.innerHTML += `<option value="${c.id}">${c.title}</option>`;
+        });
+        // Trigger loading of active contexts
+        await refreshParentWorkspace();
+        await refreshTeacherWorkspace();
+      } catch (err) {
+        console.error("Error loading seeded metadata:", err);
+      }
+    }
+    // Active dropdown switch callback
+    async function onTeacherChange() {
+      await refreshTeacherWorkspace();
+      showToast(`Context switched to Teacher: ${getSelectedTeacherName()}`);
+    }
+    async function onParentChange() {
+      await refreshParentWorkspace();
+      showToast(`Context switched to Parent: ${getSelectedParentName()}`);
+    }
+    function getSelectedTeacherId() {
+      return document.getElementById("select-active-teacher").value;
+    }
+    function getSelectedTeacherName() {
+      const el = document.getElementById("select-active-teacher");
+      return el.options[el.selectedIndex]?.text || "Teacher";
+    }
+    function getSelectedParentId() {
+      return document.getElementById("select-active-parent").value;
+    }
+    function getSelectedParentName() {
+      const el = document.getElementById("select-active-parent");
+      return el.options[el.selectedIndex]?.text || "Parent";
+    }
+    // ------------------------------------------------------------------------
+    // WORKSPACE REFRESHERS
+    // ------------------------------------------------------------------------
+    
+    async function refreshParentWorkspace() {
+      const parentId = getSelectedParentId();
+      if (!parentId) return;
+      // Update titles
+      document.getElementById("label-parent-bookings").textContent = `Bookings for ${getSelectedParentName().split(" (")[0]}`;
+      
+      await loadOfferings();
+      await loadParentBookings();
+    }
+    async function refreshTeacherWorkspace() {
+      const teacherId = getSelectedTeacherId();
+      if (!teacherId) return;
+      document.getElementById("label-teacher-offerings").textContent = `Schedules for ${getSelectedTeacherName().split(" (")[0]}`;
+      try {
+        // Fetch teacher scheduled offerings
+        const res = await fetch(`/api/teachers/${teacherId}/offerings`);
+        const data = await res.json();
+        
+        // 1. Populate Target Section dropdown inside Schedule form
+        const formSelect = document.getElementById("select-teacher-offering");
+        formSelect.innerHTML = "";
+        
+        // 2. Populate Teacher scheduled table
+        const tbody = document.getElementById("teacher-offerings-table-body");
+        tbody.innerHTML = "";
+        if (data.status === "success" && data.data.length > 0) {
+          data.data.forEach(o => {
+            formSelect.innerHTML += `<option value="${o.offeringId}">${o.offeringName} (${o.course.title})</option>`;
+            let sessHtml = "";
+            if (o.sessions.length > 0) {
+              o.sessions.forEach(s => {
+                sessHtml += `<div class="session-card">UTC: ${s.startTime.replace("T", " ").substring(0, 19)}</div>`;
+              });
+            } else {
+              sessHtml = `<span style="color: var(--text-muted); font-size: 0.8rem;">No sessions scheduled yet</span>`;
+            }
+            tbody.innerHTML += `
+              <tr>
+                <td><strong>${o.offeringName}</strong></td>
+                <td>
+                  <div>${o.course.title}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">${o.course.description}</div>
+                </td>
+                <td>
+                  <span class="badge ${o.bookingsCount >= o.capacity ? 'badge-danger' : 'badge-success'}">
+                    ${o.bookingsCount} / ${o.capacity} Enrolled
+                  </span>
+                </td>
+                <td>
+                  <div class="session-cards">${sessHtml}</div>
+                </td>
+              </tr>
+            `;
+          });
+        } else {
+          formSelect.innerHTML = `<option value="">-- Create a class section first --</option>`;
+          tbody.innerHTML = `
             <tr>
-              <td><strong>${o.name}</strong></td>
-              <td>
-                <span class="copy-link td-mono" onclick="copyToClipboard('${o.id}','Offering ID')" title="Click to copy">
-                  ${o.id.slice(0,20)}…
-                </span>
-              </td>
-              <td><span class="badge badge-gray">${o.capacity}</span></td>
-              <td>
-                <span class="badge ${(o.bookingCount||0) >= o.capacity ? 'badge-red' : 'badge-green'}">
-                  ${o.bookingCount || 0} / ${o.capacity}
-                </span>
-              </td>
-              <td>
-                ${(o.sessions || []).length === 0
-                  ? '<span class="badge badge-gray">None</span>'
-                  : (o.sessions || []).map(s =>
-                    `<div class="td-sub" style="margin-bottom:2px">${fmt(s.startTime)} → ${fmt(s.endTime)}</div>`
-                  ).join('')
-                }
+              <td colspan="4" style="color: var(--text-muted); text-align: center; padding: 2.5rem;">
+                No class offerings created by this teacher yet. Create one on the left.
               </td>
             </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-// ── Browse Offerings ──────────────────────────────────────────────
-async function browseOfferings() {
-  const tz = document.getElementById('browse-tz').value;
-  const { ok, data } = await api('GET', `/api/parents/offerings?timezone=${encodeURIComponent(tz)}`);
-  const container = document.getElementById('browse-result');
-
-  if (!ok) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-title">Error loading offerings</div></div>`;
-    return;
-  }
-
-  const offerings = data.data || [];
-  if (offerings.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-title">No offerings available</div><div class="empty-desc">Create one from Teacher → Create Offering, then add sessions.</div></div>`;
-    return;
-  }
-
-  container.innerHTML = `
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Offering</th>
-            <th>Course</th>
-            <th>Teacher</th>
-            <th>Offering ID</th>
-            <th>Availability</th>
-            <th>Sessions (${tz})</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${offerings.map(o => `
+          `;
+        }
+      } catch (err) {
+        console.error("Error refreshing teacher workspace:", err);
+      }
+    }
+    // Browse Available Offerings
+    async function loadOfferings() {
+      const tz = document.getElementById("select-parent-timezone").value;
+      const box = document.getElementById("avail-offerings-box");
+      const parentId = getSelectedParentId();
+      try {
+        const res = await fetch(`/api/parents/offerings?timezone=${tz}`);
+        const data = await res.json();
+        if (data.status === "success" && data.data.length > 0) {
+          box.innerHTML = "";
+          data.data.forEach(o => {
+            const isFull = o.bookingsCount >= o.capacity;
+            const badgeClass = isFull ? "badge-danger" : "badge-success";
+            const badgeText = isFull ? "Fully Booked" : "Available";
+            let sessHtml = "";
+            o.sessions.forEach(s => {
+              sessHtml += `<div class="session-card">${s.displayStartTime}</div>`;
+            });
+            box.innerHTML += `
+              <div class="card" style="padding: 1.25rem; margin-bottom: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                  <div>
+                    <h4 style="font-size: 1rem; font-weight: 700;">${o.course.title}</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.1rem;">Section: ${o.offeringName} | Teacher: ${o.teacher.name}</p>
+                  </div>
+                  <span class="badge ${badgeClass}">${badgeText} (${o.bookingsCount}/${o.capacity})</span>
+                </div>
+                
+                <div style="margin-bottom: 1.25rem;">
+                  <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Session Timings (${tz})</span>
+                  <div class="session-cards" style="margin-top: 0.35rem;">${sessHtml}</div>
+                </div>
+                <button class="btn" onclick="bookClass('${o.offeringId}', '${o.offeringName}')" ${isFull ? 'disabled' : ''}>
+                  Book Entire Section
+                </button>
+              </div>
+            `;
+          });
+        } else {
+          box.innerHTML = `
+            <div style="text-align: center; padding: 2rem; border: 1px dashed var(--border-slate); border-radius: 6px; color: var(--text-muted);">
+              No available offerings found. Try scheduling offerings inside the Teacher Workspace.
+            </div>
+          `;
+        }
+      } catch (err) {
+        box.innerHTML = `<p style="color: var(--accent-red); font-size: 0.9rem;">Failed to fetch class sections.</p>`;
+      }
+    }
+    // Load parent bookings
+    async function loadParentBookings() {
+      const parentId = getSelectedParentId();
+      const tz = document.getElementById("select-parent-timezone").value;
+      const tbody = document.getElementById("parent-bookings-table-body");
+      try {
+        const res = await fetch(`/api/parents/${parentId}/bookings?timezone=${tz}`);
+        const data = await res.json();
+        tbody.innerHTML = "";
+        if (data.status === "success" && data.data.length > 0) {
+          data.data.forEach(b => {
+            let sessHtml = "";
+            b.sessions.forEach(s => {
+              sessHtml += `<div class="session-card">${s.displayStartTime}</div>`;
+            });
+            tbody.innerHTML += `
+              <tr>
+                <td>
+                  <strong>${b.course.title}</strong>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">Section: ${b.offeringName}</div>
+                </td>
+                <td>
+                  <div>${b.teacher.name}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">${b.teacher.email}</div>
+                </td>
+                <td>
+                  <div class="session-cards">${sessHtml}</div>
+                </td>
+                <td>
+                  <span class="badge badge-success">Enrolled</span>
+                </td>
+              </tr>
+            `;
+          });
+        } else {
+          tbody.innerHTML = `
             <tr>
-              <td><strong>${o.name}</strong></td>
-              <td class="td-sub">${o.courseTitle || '—'}</td>
-              <td class="td-sub">${o.teacherName || '—'}</td>
-              <td>
-                <span class="copy-link td-mono" onclick="prefillBook('${o.id}')" title="Click to use in Book Offering">
-                  ${o.id.slice(0,20)}…
-                </span>
-              </td>
-              <td>
-                ${(o.spotsLeft||0) > 0
-                  ? `<span class="badge badge-green">${o.spotsLeft} spots left</span>`
-                  : `<span class="badge badge-red">Full</span>`
-                }
-              </td>
-              <td>
-                ${(o.sessions || []).length === 0
-                  ? '<span style="color:var(--text-3);font-size:12px">No sessions yet</span>'
-                  : (o.sessions || []).map(s =>
-                    `<div class="td-sub" style="margin-bottom:2px">${s.displayStartTime || s.localStartTime || fmt(s.startTime)} → ${s.displayEndTime || s.localEndTime || fmt(s.endTime)}</div>`
-                  ).join('')
-                }
+              <td colspan="4" style="color: var(--text-muted); text-align: center; padding: 2.5rem;">
+                This parent profile is not registered in any classes yet.
               </td>
             </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-function prefillBook(id) {
-  document.getElementById('book-offering-id').value = id;
-  showAlert('Offering ID copied to Book Offering.', 'info');
-}
-
-// ── Book Offering ─────────────────────────────────────────────────
-async function bookOffering() {
-  const parentId   = document.getElementById('book-parent-id').value;
-  const offeringId = document.getElementById('book-offering-id').value.trim();
-
-  if (!parentId)   { showAlert('Please select a parent.', 'warning'); return; }
-  if (!offeringId) { showAlert('Please enter an Offering ID.', 'warning'); return; }
-
-  const { ok, data } = await api('POST', '/api/parents/bookings', { parentId, offeringId });
-  showResponse('book-response', data, ok);
-
-  if (ok) showAlert('Booking confirmed.', 'success');
-  else    showAlert(data.error || 'Booking failed.', 'error');
-}
-
-// ── My Bookings ───────────────────────────────────────────────────
-async function loadBookings() {
-  const pid = document.getElementById('mb-parent').value;
-  const tz  = document.getElementById('mb-tz').value;
-  if (!pid) { showAlert('Please select a parent.', 'warning'); return; }
-
-  const { ok, data } = await api('GET', `/api/parents/${pid}/bookings?timezone=${encodeURIComponent(tz)}`);
-  const container = document.getElementById('mb-result');
-
-  if (!ok) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-title">Error loading bookings</div></div>`;
-    return;
-  }
-
-  const bookings = data.data || [];
-  if (bookings.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-title">No bookings found for this parent</div></div>`;
-    return;
-  }
-
-  container.innerHTML = `
-    <div class="table-wrap">
-      <table>
-        <thead>
+          `;
+        }
+      } catch (err) {
+        tbody.innerHTML = `
           <tr>
-            <th>Offering</th>
-            <th>Offering ID</th>
-            <th>Booked At</th>
-            <th>Sessions (${tz})</th>
+            <td colspan="4" style="color: var(--accent-red); text-align: center; padding: 2rem;">
+              Failed to load bookings list.
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          ${bookings.map(b => `
-            <tr>
-              <td><strong>${b.offeringName || '—'}</strong></td>
-              <td><span class="td-mono">${(b.offeringId||'').slice(0,20)}…</span></td>
-              <td class="td-sub">${fmt(b.bookedAt)}</td>
-              <td>
-                ${(b.sessions || []).length === 0
-                  ? '<span style="color:var(--text-3);font-size:12px">No sessions</span>'
-                  : (b.sessions || []).map(s =>
-                    `<div class="td-sub" style="margin-bottom:2px">${s.displayStartTime || s.localStartTime || s.utcStartTime} → ${s.displayEndTime || s.localEndTime || s.utcEndTime}</div>`
-                  ).join('')
-                }
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-// ── Boot ──────────────────────────────────────────────────────────
-init();
-</script>
+        `;
+      }
+    }
+    // Create offering handler
+    document.getElementById("create-offering-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const teacherId = getSelectedTeacherId();
+      const courseId = document.getElementById("select-course").value;
+      const name = document.getElementById("input-offering-name").value;
+      const capacity = Number(document.getElementById("input-capacity").value);
+      if (!name.trim()) {
+        showToast("Class section name cannot be empty.", true);
+        return;
+      }
+      if (isNaN(capacity) || capacity < 1) {
+        showToast("Enrolled student capacity must be a positive number.", true);
+        return;
+      }
+      try {
+        const res = await fetch("/api/teachers/offerings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ teacherId, courseId, name, capacity })
+        });
+        const data = await res.json();
+        
+        if (data.status === "success") {
+          showToast(`Successfully created class section: "${name}"`);
+          document.getElementById("input-offering-name").value = "Saturday Batch";
+          await refreshTeacherWorkspace();
+          // Instantly refresh available offerings for parents too
+          await loadOfferings();
+        } else {
+          let errorMsg = data.error || "Unknown error";
+          if (data.details && Array.isArray(data.details)) {
+            errorMsg += ": " + data.details.map(d => `${d.path}: ${d.message}`).join(", ");
+          }
+          showToast("Failed to create class section: " + errorMsg, true);
+        }
+      } catch (err) {
+        showToast("Error executing request: " + err.message, true);
+      }
+    });
+    // Schedule Sessions handler
+    document.getElementById("schedule-sessions-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const teacherId = getSelectedTeacherId();
+      const offeringId = document.getElementById("select-teacher-offering").value;
+      const timezone = document.getElementById("select-teacher-timezone").value;
+      const s1Val = document.getElementById("sess1-start").value;
+      const s2Val = document.getElementById("sess2-start").value;
+      if (!offeringId) {
+        showToast("Please create or select a valid class offering section first.", true);
+        return;
+      }
+      try {
+        // Robust date parsing wrapper to catch malformed input before crashing JS
+        const parseEndDate = (strDate) => {
+          if (!strDate || !strDate.trim()) {
+            throw new Error("Session timing cannot be empty.");
+          }
+          if (!strDate.includes(" ") || strDate.trim().split(" ").length < 2) {
+            throw new Error(`Invalid format: "${strDate}". Timing must include both date and time (e.g., 2026-06-06 18:00:00).`);
+          }
+          const cleanDateStr = strDate.trim().replace(" ", "T");
+          const dt = new Date(cleanDateStr);
+          if (isNaN(dt.getTime())) {
+            throw new Error(`Invalid date/time format: "${strDate}". Please use YYYY-MM-DD HH:MM:SS format.`);
+          }
+          dt.setHours(dt.getHours() + 1);
+          return dt.toISOString().replace("T", " ").substring(0, 19);
+        };
+        const end1 = parseEndDate(s1Val);
+        const end2 = parseEndDate(s2Val);
+        const res = await fetch(`/api/teachers/offerings/${offeringId}/sessions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            teacherId,
+            timezone,
+            sessions: [
+              { startTime: s1Val, endTime: end1 },
+              { startTime: s2Val, endTime: end2 }
+            ]
+          })
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          showToast(`Successfully scheduled ${data.data.length} sessions.`);
+          await refreshTeacherWorkspace();
+          // Instantly refresh available offerings for parents too!
+          await refreshParentWorkspace();
+        } else {
+          let errorMsg = data.error || "Unknown error";
+          if (data.details && Array.isArray(data.details)) {
+            errorMsg += ": " + data.details.map(d => `${d.path}: ${d.message}`).join(", ");
+          }
+          showToast("Failed to schedule sessions: " + errorMsg, true);
+        }
+      } catch (err) {
+        showToast(err.message || "Error parsing session times.", true);
+      }
+    });
+    // Book Class action
+    async function bookClass(offeringId, offeringName) {
+      const parentId = getSelectedParentId();
+      try {
+        const res = await fetch("/api/parents/bookings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ parentId, offeringId })
+        });
+        const data = await res.json();
+        if (res.status === 201) {
+          showToast(`Success! You have registered for class section: "${offeringName}"`);
+          await refreshParentWorkspace();
+        } else {
+          let errorMsg = data.error || "Unknown error";
+          if (data.details && Array.isArray(data.details)) {
+            errorMsg += ": " + data.details.map(d => `${d.path}: ${d.message}`).join(", ");
+          }
+          showToast(`Booking Blocked: ${errorMsg}`, true);
+        }
+      } catch (err) {
+        showToast("Error executing booking transaction: " + err.message, true);
+      }
+    }
+  </script>
 </body>
 </html>
