@@ -121,6 +121,15 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    @media (max-width: 768px) {
+      .profile-selector {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
 
     .profile-selector label {
@@ -215,6 +224,13 @@
       gap: 0.5rem;
       border-bottom: 2px solid var(--border-slate);
       margin-bottom: 2.25rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .tab-navigation::-webkit-scrollbar {
+      display: none;
     }
 
     .tab-btn {
@@ -228,6 +244,7 @@
       border-bottom: 2px solid transparent;
       margin-bottom: -2px;
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
 
     .tab-btn:hover {
@@ -293,6 +310,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     /* Form Design */
@@ -584,9 +603,9 @@
         <div class="card" style="margin-bottom: 0;">
           <div class="card-title">
             <span>Browse Available Classes</span>
-            <div style="width: auto;">
+            <div style="flex: 1; min-width: 200px;">
               <select id="select-parent-timezone" onchange="loadOfferings()"
-                style="padding: 0.35rem 0.75rem; font-size: 0.8rem; min-width: 180px;">
+                style="padding: 0.35rem 0.75rem; font-size: 0.8rem; width: 100%;">
                 <option value="UTC">UTC (Greenwich Mean Time)</option>
                 <option value="America/New_York">America/New_York (Eastern Time)</option>
                 <option value="Asia/Kolkata">Asia/Kolkata (India Standard Time)</option>
@@ -924,7 +943,7 @@
             });
             box.innerHTML += `
               <div class="card" style="padding: 1.25rem; margin-bottom: 0;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
                   <div>
                     <h4 style="font-size: 1rem; font-weight: 700;">${o.course.title}</h4>
                     <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.1rem;">Section: ${o.offeringName} | Teacher: ${o.teacher.name}</p>
