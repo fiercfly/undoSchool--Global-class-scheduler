@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Global Class Booking System Administration Portal</title>
-  
+
   <!-- Premium Modern Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
   <style>
     :root {
       --bg-slate: #f8fafc;
@@ -30,11 +33,13 @@
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
       --radius: 8px;
     }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
     body {
       background-color: var(--bg-slate);
       color: var(--text-dark);
@@ -43,11 +48,13 @@
       padding: 0;
       line-height: 1.5;
     }
+
     .app-layout {
       max-width: 1200px;
       margin: 0 auto;
       padding: 2.5rem 1.5rem;
     }
+
     /* Enterprise Header */
     .app-header {
       background: var(--bg-white);
@@ -62,17 +69,20 @@
       gap: 1.5rem;
       box-shadow: var(--shadow-sm);
     }
+
     .brand-title {
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--text-dark);
       letter-spacing: -0.02em;
     }
+
     .brand-subtitle {
       color: var(--text-muted);
       font-size: 0.875rem;
       margin-top: 0.25rem;
     }
+
     .system-health {
       display: inline-flex;
       align-items: center;
@@ -85,12 +95,14 @@
       font-weight: 600;
       color: var(--accent-green);
     }
+
     .health-dot {
       width: 8px;
       height: 8px;
       background-color: var(--accent-green);
       border-radius: 50%;
     }
+
     /* Profile Switcher Bar */
     .profile-bar {
       background: var(--bg-white);
@@ -104,11 +116,13 @@
       gap: 2rem;
       align-items: center;
     }
+
     .profile-selector {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
+
     .profile-selector label {
       font-size: 0.8rem;
       font-weight: 600;
@@ -116,6 +130,7 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
+
     .profile-selector select {
       background: var(--bg-slate);
       border: 1px solid var(--border-slate);
@@ -129,10 +144,12 @@
       cursor: pointer;
       transition: all 0.15s ease;
     }
+
     .profile-selector select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 2px var(--primary-light);
     }
+
     /* Notification Toasts */
     .alert-banner {
       position: fixed;
@@ -153,20 +170,31 @@
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
       animation: slideIn 0.3s ease;
     }
+
     @keyframes slideIn {
-      from { transform: translateY(-10px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(-10px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
+
     .alert-success {
       background-color: var(--accent-green-bg);
       border-color: rgba(5, 150, 105, 0.15);
       color: var(--accent-green);
     }
+
     .alert-danger {
       background-color: var(--accent-red-bg);
       border-color: rgba(220, 38, 38, 0.15);
       color: var(--accent-red);
     }
+
     .alert-banner .alert-close {
       margin-left: auto;
       cursor: pointer;
@@ -176,9 +204,11 @@
       color: inherit;
       opacity: 0.7;
     }
+
     .alert-banner .alert-close:hover {
       opacity: 1;
     }
+
     /* Navigation Tabs */
     .tab-navigation {
       display: flex;
@@ -186,6 +216,7 @@
       border-bottom: 2px solid var(--border-slate);
       margin-bottom: 2.25rem;
     }
+
     .tab-btn {
       background: none;
       border: none;
@@ -198,38 +229,52 @@
       margin-bottom: -2px;
       transition: all 0.2s ease;
     }
+
     .tab-btn:hover {
       color: var(--primary);
     }
+
     .tab-btn.active {
       color: var(--primary);
       border-bottom: 2px solid var(--primary);
     }
+
     .tab-panel {
       display: none;
     }
+
     .tab-panel.active {
       display: block;
       animation: fadeIn 0.2s ease;
     }
+
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
+
     /* Grid Layouts */
     .grid-layout {
       display: grid;
       grid-template-columns: 1fr;
       gap: 2rem;
     }
+
     @media (min-width: 992px) {
       .grid-layout-2 {
         grid-template-columns: 420px 1fr;
       }
+
       .grid-layout-equal {
         grid-template-columns: 1fr 1fr;
       }
     }
+
     /* Enterprise Cards */
     .card {
       background: var(--bg-white);
@@ -239,6 +284,7 @@
       box-shadow: var(--shadow-sm);
       margin-bottom: 1.5rem;
     }
+
     .card-title {
       font-size: 1.05rem;
       font-weight: 700;
@@ -248,6 +294,7 @@
       justify-content: space-between;
       align-items: center;
     }
+
     /* Form Design */
     .form-group {
       margin-bottom: 1.25rem;
@@ -255,6 +302,7 @@
       flex-direction: column;
       gap: 0.4rem;
     }
+
     label {
       font-size: 0.75rem;
       font-weight: 600;
@@ -262,7 +310,9 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
-    input, select {
+
+    input,
+    select {
       background: var(--bg-white);
       border: 1px solid var(--border-slate);
       border-radius: 6px;
@@ -275,20 +325,26 @@
       outline: none;
       width: 100%;
     }
-    input:focus, select:focus {
+
+    input:focus,
+    select:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 2px var(--primary-light);
     }
-    input:disabled, select:disabled {
+
+    input:disabled,
+    select:disabled {
       background: var(--bg-slate);
       opacity: 0.75;
       cursor: not-allowed;
     }
+
     .input-helper {
       font-size: 0.75rem;
       color: var(--text-muted);
       margin-top: 0.25rem;
     }
+
     /* Buttons */
     .btn {
       background-color: var(--primary);
@@ -307,35 +363,43 @@
       gap: 0.5rem;
       width: 100%;
     }
+
     .btn:hover {
       background-color: var(--primary-hover);
     }
+
     .btn-secondary {
       background-color: var(--bg-white);
       border: 1px solid var(--border-slate);
       color: var(--text-dark);
     }
+
     .btn-secondary:hover {
       background-color: var(--bg-slate);
     }
+
     .btn-danger {
       background-color: var(--accent-red);
     }
+
     .btn-danger:hover {
       background-color: #b91c1c;
     }
+
     /* Table Design */
     .table-container {
       overflow-x: auto;
       border: 1px solid var(--border-slate);
       border-radius: 6px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
       font-size: 0.875rem;
     }
+
     th {
       background: var(--bg-slate);
       color: var(--text-muted);
@@ -346,15 +410,18 @@
       padding: 0.75rem 1rem;
       border-bottom: 1px solid var(--border-slate);
     }
+
     td {
       padding: 1rem;
       border-bottom: 1px solid var(--border-slate);
       color: var(--text-dark);
       vertical-align: middle;
     }
+
     tr:last-child td {
       border-bottom: none;
     }
+
     /* Badge Indicators */
     .badge {
       display: inline-flex;
@@ -366,9 +433,25 @@
       border-radius: 9999px;
       line-height: 1;
     }
-    .badge-success { background: var(--accent-green-bg); color: var(--accent-green); border: 1px solid rgba(5, 150, 105, 0.1); }
-    .badge-danger { background: var(--accent-red-bg); color: var(--accent-red); border: 1px solid rgba(220, 38, 38, 0.1); }
-    .badge-info { background: var(--accent-blue-bg); color: var(--accent-blue); border: 1px solid rgba(37, 99, 235, 0.1); }
+
+    .badge-success {
+      background: var(--accent-green-bg);
+      color: var(--accent-green);
+      border: 1px solid rgba(5, 150, 105, 0.1);
+    }
+
+    .badge-danger {
+      background: var(--accent-red-bg);
+      color: var(--accent-red);
+      border: 1px solid rgba(220, 38, 38, 0.1);
+    }
+
+    .badge-info {
+      background: var(--accent-blue-bg);
+      color: var(--accent-blue);
+      border: 1px solid rgba(37, 99, 235, 0.1);
+    }
+
     /* Session List styling */
     .session-cards {
       display: flex;
@@ -376,6 +459,7 @@
       gap: 0.5rem;
       margin-top: 0.25rem;
     }
+
     .session-card {
       background: var(--bg-slate);
       border: 1px solid var(--border-slate);
@@ -386,6 +470,7 @@
       font-weight: 500;
       color: var(--text-muted);
     }
+
     /* Diagnostics Log Screen */
     .terminal-console {
       background: #0f172a;
@@ -399,6 +484,7 @@
       line-height: 1.6;
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
     }
+
     .console-heading {
       color: #94a3b8;
       border-bottom: 1px solid #1e293b;
@@ -409,20 +495,54 @@
       justify-content: space-between;
       align-items: center;
     }
-    .console-line { color: #cbd5e1; margin-bottom: 0.25rem; word-break: break-all; }
-    .console-success { color: #34d399; font-weight: 500; margin-bottom: 0.25rem; }
-    .console-error { color: #f87171; font-weight: 500; margin-bottom: 0.25rem; }
-    .console-info { color: #60a5fa; margin-bottom: 0.25rem; }
+
+    .console-line {
+      color: #cbd5e1;
+      margin-bottom: 0.25rem;
+      word-break: break-all;
+    }
+
+    .console-success {
+      color: #34d399;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .console-error {
+      color: #f87171;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .console-info {
+      color: #60a5fa;
+      margin-bottom: 0.25rem;
+    }
+
     /* Custom scrollbars */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-slate); }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-slate);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
   </style>
 </head>
+
 <body>
   <div class="app-layout">
-    
+
     <!-- Dynamic Alert Banner Toast -->
     <div id="toast-banner" class="alert-banner">
       <span id="toast-msg"></span>
@@ -452,19 +572,21 @@
     </div>
     <!-- Workspace Navigation -->
     <nav class="tab-navigation">
-      <button id="btn-tab-parent" class="tab-btn active" onclick="switchTab('parent-workspace')">Parent Workspace</button>
+      <button id="btn-tab-parent" class="tab-btn active" onclick="switchTab('parent-workspace')">Parent
+        Workspace</button>
       <button id="btn-tab-teacher" class="tab-btn" onclick="switchTab('teacher-workspace')">Teacher Workspace</button>
     </nav>
     <!-- TAB 1: PARENT WORKSPACE -->
     <section id="parent-workspace" class="tab-panel active">
       <div class="grid-layout grid-layout-2">
-        
+
         <!-- Left Side: Class Explorer -->
         <div class="card" style="margin-bottom: 0;">
           <div class="card-title">
             <span>Browse Available Classes</span>
             <div style="width: auto;">
-              <select id="select-parent-timezone" onchange="loadOfferings()" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; min-width: 180px;">
+              <select id="select-parent-timezone" onchange="loadOfferings()"
+                style="padding: 0.35rem 0.75rem; font-size: 0.8rem; min-width: 180px;">
                 <option value="UTC">UTC (Greenwich Mean Time)</option>
                 <option value="America/New_York">America/New_York (Eastern Time)</option>
                 <option value="Asia/Kolkata">Asia/Kolkata (India Standard Time)</option>
@@ -472,7 +594,7 @@
               </select>
             </div>
           </div>
-          
+
           <div id="avail-offerings-box" style="display: flex; flex-direction: column; gap: 1rem;">
             <p style="color: var(--text-muted); font-size: 0.9rem;">Loading available classes...</p>
           </div>
@@ -482,7 +604,7 @@
           <div class="card-title">
             <span id="label-parent-bookings">Your Enrolled Bookings</span>
           </div>
-          
+
           <div class="table-container">
             <table>
               <thead>
@@ -508,7 +630,7 @@
     <!-- TAB 2: TEACHER WORKSPACE -->
     <section id="teacher-workspace" class="tab-panel">
       <div class="grid-layout grid-layout-2">
-        
+
         <!-- Left Side: Teacher Actions -->
         <div>
           <!-- Create Offering Card -->
@@ -551,12 +673,14 @@
               </div>
               <div class="form-group">
                 <label for="sess1-start">Session 1 Timing</label>
-                <input type="text" id="sess1-start" value="2026-06-06 18:00:00" style="font-family: monospace;" required>
+                <input type="text" id="sess1-start" value="2026-06-06 18:00:00" style="font-family: monospace;"
+                  required>
                 <span class="input-helper">Format: YYYY-MM-DD HH:MM:SS</span>
               </div>
               <div class="form-group">
                 <label for="sess2-start">Session 2 Timing</label>
-                <input type="text" id="sess2-start" value="2026-06-13 18:00:00" style="font-family: monospace;" required>
+                <input type="text" id="sess2-start" value="2026-06-13 18:00:00" style="font-family: monospace;"
+                  required>
                 <span class="input-helper">Format: YYYY-MM-DD HH:MM:SS</span>
               </div>
               <button type="submit" class="btn">Schedule Sessions</button>
@@ -606,7 +730,7 @@
     function showToast(message, isError = false) {
       const banner = document.getElementById("toast-banner");
       const msgSpan = document.getElementById("toast-msg");
-      
+
       banner.className = isError ? "alert-banner alert-danger" : "alert-banner alert-success";
       msgSpan.textContent = message;
       banner.style.display = "flex";
@@ -626,7 +750,7 @@
         btn.classList.remove("active");
       });
       document.getElementById(tabId).classList.add("active");
-      
+
       if (tabId === 'parent-workspace') {
         document.getElementById("btn-tab-parent").classList.add("active");
         refreshParentWorkspace();
@@ -663,7 +787,7 @@
         // Prefill Context Selector dropdowns
         const teacherSelect = document.getElementById("select-active-teacher");
         const parentSelect = document.getElementById("select-active-parent");
-        
+
         teacherSelect.innerHTML = "";
         data.teachers.forEach(t => {
           teacherSelect.innerHTML += `<option value="${t.id}">${t.name} (${t.email})</option>`;
@@ -711,13 +835,13 @@
     // ------------------------------------------------------------------------
     // WORKSPACE REFRESHERS
     // ------------------------------------------------------------------------
-    
+
     async function refreshParentWorkspace() {
       const parentId = getSelectedParentId();
       if (!parentId) return;
       // Update titles
       document.getElementById("label-parent-bookings").textContent = `Bookings for ${getSelectedParentName().split(" (")[0]}`;
-      
+
       await loadOfferings();
       await loadParentBookings();
     }
@@ -729,11 +853,11 @@
         // Fetch teacher scheduled offerings
         const res = await fetch(`/api/teachers/${teacherId}/offerings`);
         const data = await res.json();
-        
+
         // 1. Populate Target Section dropdown inside Schedule form
         const formSelect = document.getElementById("select-teacher-offering");
         formSelect.innerHTML = "";
-        
+
         // 2. Populate Teacher scheduled table
         const tbody = document.getElementById("teacher-offerings-table-body");
         tbody.innerHTML = "";
@@ -904,7 +1028,7 @@
           body: JSON.stringify({ teacherId, courseId, name, capacity })
         });
         const data = await res.json();
-        
+
         if (data.status === "success") {
           showToast(`Successfully created class section: "${name}"`);
           document.getElementById("input-offering-name").value = "Saturday Batch";
@@ -949,7 +1073,16 @@
             throw new Error(`Invalid date/time format: "${strDate}". Please use YYYY-MM-DD HH:MM:SS format.`);
           }
           dt.setHours(dt.getHours() + 1);
-          return dt.toISOString().replace("T", " ").substring(0, 19);
+          // Format back in same local representation (no UTC shifts) to preserve timezone reference for the backend
+          const pad = (n) => String(n).padStart(2, '0');
+          const yyyy = dt.getFullYear();
+          const mm = pad(dt.getMonth() + 1);
+          const dd = pad(dt.getDate());
+          const hh = pad(dt.getHours());
+          const min = pad(dt.getMinutes());
+          const ss = pad(dt.getSeconds());
+
+          return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
         };
         const end1 = parseEndDate(s1Val);
         const end2 = parseEndDate(s2Val);
@@ -1008,4 +1141,5 @@
     }
   </script>
 </body>
+
 </html>

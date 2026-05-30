@@ -29,15 +29,13 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Metadata endpoint: returns all seeded teachers, parents, and courses so the UI can populate dropdowns
+// Dynamic Seed Metadata endpoint for the Playground frontend
 app.get("/api/metadata", async (req, res, next) => {
   try {
-    const [teachers, parents, courses] = await Promise.all([
-      db("teachers").select("id", "name", "email"),
-      db("parents").select("id", "name", "email"),
-      db("courses").select("id", "title"),
-    ]);
-    res.status(200).json({ teachers, parents, courses });
+    const courses = await db("courses").select("id", "title", "description");
+    const teachers = await db("teachers").select("id", "name", "email");
+    const parents = await db("parents").select("id", "name", "email");
+    res.status(200).json({ courses, teachers, parents });
   } catch (err) {
     next(err);
   }
@@ -47,7 +45,7 @@ app.get("/api/metadata", async (req, res, next) => {
 app.use("/api", apiRoutes);
 
 // Fallback for unmatched routes
-app.use((req, res) => {
+app.use((req, res, next) => {
   res.status(404).json({
     status: "fail",
     error: `Route not found: ${req.method} ${req.originalUrl}`,
